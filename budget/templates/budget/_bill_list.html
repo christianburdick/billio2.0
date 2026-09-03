@@ -1,0 +1,119 @@
+{% for bill, occurrence_date in bill_occurrences %}
+
+<div class="bill">
+
+    <div
+        class="bill-name"
+        data-bill-id="{{ bill.id }}"
+    >
+        <span class="bill-name-display">
+            {{ bill.name }}
+        </span>
+
+        <input
+            class="bill-name-input"
+            type="text"
+            value="{{ bill.name }}"
+            maxlength="100"
+        >
+    </div>
+
+
+    <div
+        class="bill-date"
+        data-bill-id="{{ bill.id }}"
+    >
+        <span class="bill-date-display">
+            Due {{ occurrence_date|date:"M j, Y" }}
+        </span>
+
+        <input
+            class="bill-date-input"
+            type="date"
+            value="{{ bill.due_date|date:'Y-m-d' }}"
+        >
+    </div>
+
+
+    <div
+        class="bill-frequency"
+        data-bill-id="{{ bill.id }}"
+    >
+        <span class="bill-frequency-display">
+            {{ bill.get_frequency_display }}
+        </span>
+
+        <select class="bill-frequency-input">
+
+            <option
+                value="one_time"
+                {% if bill.frequency == "one_time" %}selected{% endif %}
+            >
+                One time
+            </option>
+
+            <option
+                value="weekly"
+                {% if bill.frequency == "weekly" %}selected{% endif %}
+            >
+                Weekly
+            </option>
+
+            <option
+                value="biweekly"
+                {% if bill.frequency == "biweekly" %}selected{% endif %}
+            >
+                Every 2 weeks
+            </option>
+
+            <option
+                value="monthly"
+                {% if bill.frequency == "monthly" %}selected{% endif %}
+            >
+                Monthly
+            </option>
+
+            <option
+                value="quarterly"
+                {% if bill.frequency == "quarterly" %}selected{% endif %}
+            >
+                Every 3 months
+            </option>
+
+            <option
+                value="yearly"
+                {% if bill.frequency == "yearly" %}selected{% endif %}
+            >
+                Yearly
+            </option>
+
+        </select>
+    </div>
+
+
+    <div
+        class="bill-amount"
+        data-bill-id="{{ bill.id }}"
+    >
+        <span class="bill-amount-display">
+            ${{ bill.amount|floatformat:2 }}
+        </span>
+
+        <input
+            class="bill-amount-input"
+            type="number"
+            step="0.01"
+            min="0"
+            value="{{ bill.amount }}"
+        >
+    </div>
+
+</div>
+
+{% empty %}
+
+<div class="empty">
+    No bills this pay period.
+</div>
+
+{% endfor %}

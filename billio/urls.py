@@ -3,7 +3,6 @@ from django.urls import path
 from budget.views import (
     home,
     delete_bill,
-    edit_bill,
     update_bill_amount,
     update_bill_frequency,
     update_bill_name,
@@ -19,12 +18,7 @@ urlpatterns = [
         delete_bill,
         name="delete_bill",
     ),
-
-    path(
-        "bill/<int:bill_id>/edit/",
-        edit_bill,
-        name="edit_bill",
-    ),
+    
     path(
     "bill/<int:bill_id>/amount/",
     update_bill_amount,

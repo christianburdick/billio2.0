@@ -3,6 +3,8 @@ const actionMenu = document.getElementById("action-menu");
 
 const addBillButton = document.getElementById("add-bill-button");
 const addBillForm = document.getElementById("add-bill-form");
+const addBillModal =
+    document.getElementById("add-bill-modal");
 
 const updatePayButton = document.getElementById("update-pay-button");
 const updatePayForm = document.getElementById("update-pay-form");
@@ -12,166 +14,583 @@ const updatePayForm = document.getElementById("update-pay-form");
 // Floating action menu
 // ----------------------------------------
 
-addButton.addEventListener("click", function () {
+if (addButton && actionMenu) {
 
-    actionMenu.classList.toggle("show");
-    addButton.classList.toggle("open");
+    addButton.addEventListener("click", function () {
 
-});
+        actionMenu.classList.toggle("show");
+        addButton.classList.toggle("open");
+
+    });
+
+}
 
 
 // ----------------------------------------
 // Show Add Bill form
 // ----------------------------------------
 
-addBillButton.addEventListener("click", function () {
+if (addBillButton && addBillModal) {
 
-    actionMenu.classList.remove("show");
-    addButton.classList.remove("open");
+    addBillButton.addEventListener("click", function () {
 
-    addBillForm.style.display = "block";
+        actionMenu.classList.remove("show");
+        addButton.classList.remove("open");
 
-});
+        addBillModal.classList.add("show");
+
+    });
+
+}
 
 
 // ----------------------------------------
 // Show Update Paycheck form
 // ----------------------------------------
 
-updatePayButton.addEventListener("click", function () {
+if (updatePayButton && updatePayForm) {
 
-    actionMenu.classList.remove("show");
-    addButton.classList.remove("open");
+    updatePayButton.addEventListener("click", function () {
 
-    updatePayForm.style.display = "block";
+        actionMenu.classList.remove("show");
+        addButton.classList.remove("open");
 
-});
+        updatePayForm.style.display = "block";
+
+    });
+
+}
 
 
 // ----------------------------------------
-// Bill amount inline editing
+// Initialize bill editing
 // ----------------------------------------
 
-const billAmounts = document.querySelectorAll(".bill-amount");
+function initializeBillEditing() {
 
-billAmounts.forEach(function (billAmount) {
+    initializeBillAmounts();
 
-    const display =
-        billAmount.querySelector(".bill-amount-display");
+    initializeBillDates();
 
-    const input =
-        billAmount.querySelector(".bill-amount-input");
+    initializeBillFrequencies();
 
+    initializeBillNames();
 
-    // Click the displayed amount to edit it
-
-    display.addEventListener("click", function (event) {
-
-        event.stopPropagation();
-
-        billAmount.classList.add("editing");
-
-        input.focus();
-        input.select();
-
-    });
+}
 
 
-    // Press Enter to save
+// ----------------------------------------
+// Bill amount editing
+// ----------------------------------------
 
-    input.addEventListener("keydown", function (event) {
+function initializeBillAmounts() {
 
-        if (event.key === "Enter") {
-            saveBillAmount();
-        }
-
-
-        // Press Escape to cancel
-
-        if (event.key === "Escape") {
-
-            input.value = input.defaultValue;
-
-            billAmount.classList.remove("editing");
-
-        }
-
-    });
+    const billAmounts =
+        document.querySelectorAll(".bill-amount");
 
 
-    // Clicking away saves the amount
+    billAmounts.forEach(function (billAmount) {
 
-    input.addEventListener("blur", function () {
+        const display =
+            billAmount.querySelector(".bill-amount-display");
 
-        saveBillAmount();
-
-    });
-
-
-    function saveBillAmount() {
-
-        const amount = input.value;
+        const input =
+            billAmount.querySelector(".bill-amount-input");
 
 
-        // Don't save an empty value
-
-        if (!amount) {
-
-            input.value = input.defaultValue;
-
-            billAmount.classList.remove("editing");
-
+        if (!display || !input) {
             return;
-
         }
 
 
-        const billId = billAmount.dataset.billId;
+        display.addEventListener("click", function (event) {
 
+            event.stopPropagation();
 
-        fetch(`/bill/${billId}/amount/`, {
+            billAmount.classList.add("editing");
 
-            method: "POST",
-
-            headers: {
-                "Content-Type":
-                    "application/x-www-form-urlencoded",
-
-                "X-CSRFToken":
-                    getCookie("csrftoken")
-            },
-
-            body:
-                `amount=${encodeURIComponent(amount)}`
-
-        })
-
-        .then(function (response) {
-
-            return response.json();
-
-        })
-
-        .then(function (data) {
-
-            if (data.success) {
-
-                display.textContent =
-                    `$${parseFloat(amount).toFixed(2)}`;
-
-                input.defaultValue = amount;
-
-                updateDashboard(data);
-
-            }
-
-            billAmount.classList.remove("editing");
+            input.focus();
+            input.select();
 
         });
 
+
+        input.addEventListener("keydown", function (event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                saveBillAmount();
+
+            }
+
+
+            if (event.key === "Escape") {
+
+                input.value = input.defaultValue;
+
+                billAmount.classList.remove("editing");
+
+            }
+
+        });
+
+
+        input.addEventListener("blur", function () {
+
+            saveBillAmount();
+
+        });
+
+
+        function saveBillAmount() {
+
+            const amount = input.value;
+
+
+            if (!amount) {
+
+                input.value = input.defaultValue;
+
+                billAmount.classList.remove("editing");
+
+                return;
+
+            }
+
+
+            const billId =
+                billAmount.dataset.billId;
+
+
+            fetch(`/bill/${billId}/amount/`, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded",
+
+                    "X-CSRFToken":
+                        getCookie("csrftoken")
+                },
+
+                body:
+                    `amount=${encodeURIComponent(amount)}`
+
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+
+                if (data.success) {
+
+                    updateDashboard(data);
+
+                }
+
+                billAmount.classList.remove("editing");
+
+            });
+
+        }
+
+    });
+
+}
+
+
+// ----------------------------------------
+// Bill due date editing
+// ----------------------------------------
+
+function initializeBillDates() {
+
+    const billDates =
+        document.querySelectorAll(".bill-date");
+
+
+    billDates.forEach(function (billDate) {
+
+        const display =
+            billDate.querySelector(".bill-date-display");
+
+        const input =
+            billDate.querySelector(".bill-date-input");
+
+
+        if (!display || !input) {
+            return;
+        }
+
+
+        display.addEventListener("click", function (event) {
+
+            event.stopPropagation();
+
+            billDate.classList.add("editing");
+
+            input.focus();
+
+
+            if (input.showPicker) {
+                input.showPicker();
+            }
+
+        });
+
+
+        input.addEventListener("change", function () {
+
+            saveBillDate();
+
+        });
+
+
+        input.addEventListener("blur", function () {
+
+            billDate.classList.remove("editing");
+
+        });
+
+
+        function saveBillDate() {
+
+            const date = input.value;
+
+
+            if (!date) {
+                return;
+            }
+
+
+            const billId =
+                billDate.dataset.billId;
+
+
+            fetch(`/bill/${billId}/date/`, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded",
+
+                    "X-CSRFToken":
+                        getCookie("csrftoken")
+                },
+
+                body:
+                    `due_date=${encodeURIComponent(date)}`
+
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+
+                if (data.success) {
+
+                    updateDashboard(data);
+
+                }
+
+                billDate.classList.remove("editing");
+
+            });
+
+        }
+
+    });
+
+}
+
+
+// ----------------------------------------
+// Bill frequency editing
+// ----------------------------------------
+
+function initializeBillFrequencies() {
+
+    const billFrequencies =
+        document.querySelectorAll(".bill-frequency");
+
+
+    billFrequencies.forEach(function (billFrequency) {
+
+        const display =
+            billFrequency.querySelector(
+                ".bill-frequency-display"
+            );
+
+        const input =
+            billFrequency.querySelector(
+                ".bill-frequency-input"
+            );
+
+
+        if (!display || !input) {
+            return;
+        }
+
+
+        display.addEventListener("click", function (event) {
+
+            event.stopPropagation();
+
+            billFrequency.classList.add("editing");
+
+            input.focus();
+
+        });
+
+
+        input.addEventListener("change", function () {
+
+            saveBillFrequency();
+
+        });
+
+
+        input.addEventListener("blur", function () {
+
+            billFrequency.classList.remove("editing");
+
+        });
+
+
+        function saveBillFrequency() {
+
+            const frequency = input.value;
+
+            const billId =
+                billFrequency.dataset.billId;
+
+
+            fetch(`/bill/${billId}/frequency/`, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded",
+
+                    "X-CSRFToken":
+                        getCookie("csrftoken")
+                },
+
+                body:
+                    `frequency=${encodeURIComponent(frequency)}`
+
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+
+                if (data.success) {
+
+                    updateDashboard(data);
+
+                }
+
+                billFrequency.classList.remove("editing");
+
+            });
+
+        }
+
+    });
+
+}
+
+
+// ----------------------------------------
+// Bill name editing
+// ----------------------------------------
+
+function initializeBillNames() {
+
+    const billNames =
+        document.querySelectorAll(".bill-name");
+
+
+    billNames.forEach(function (billName) {
+
+        const display =
+            billName.querySelector(".bill-name-display");
+
+        const input =
+            billName.querySelector(".bill-name-input");
+
+
+        if (!display || !input) {
+            return;
+        }
+
+
+        display.addEventListener("click", function (event) {
+
+            event.stopPropagation();
+
+            billName.classList.add("editing");
+
+            input.focus();
+            input.select();
+
+        });
+
+
+        input.addEventListener("keydown", function (event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                saveBillName();
+
+            }
+
+
+            if (event.key === "Escape") {
+
+                input.value = input.defaultValue;
+
+                billName.classList.remove("editing");
+
+            }
+
+        });
+
+
+        input.addEventListener("blur", function () {
+
+            saveBillName();
+
+        });
+
+
+        function saveBillName() {
+
+            const name = input.value.trim();
+
+
+            if (!name) {
+
+                input.value = input.defaultValue;
+
+                billName.classList.remove("editing");
+
+                return;
+
+            }
+
+
+            const billId =
+                billName.dataset.billId;
+
+
+            fetch(`/bill/${billId}/name/`, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded",
+
+                    "X-CSRFToken":
+                        getCookie("csrftoken")
+                },
+
+                body:
+                    `name=${encodeURIComponent(name)}`
+
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+
+                if (data.success) {
+
+                    display.textContent = name;
+
+                    input.defaultValue = name;
+
+                }
+
+                billName.classList.remove("editing");
+
+            });
+
+        }
+
+    });
+
+}
+
+
+// ----------------------------------------
+// Update dashboard
+// ----------------------------------------
+
+function updateDashboard(data) {
+
+    if (!data.success) {
+        return;
     }
 
-});
+
+    // Update remaining amount
+
+    const remainingAmount =
+        document.querySelector(".hero-amount");
+
+
+    if (remainingAmount) {
+
+        remainingAmount.textContent =
+            `$${parseFloat(data.remaining).toFixed(2)}`;
+
+    }
+
+
+    // Update total bills
+
+    const totalBills =
+        document.querySelector(".bills-total");
+
+
+    if (totalBills) {
+
+        totalBills.textContent =
+            `-$${parseFloat(data.total_bills).toFixed(2)}`;
+
+    }
+
+
+    // Replace bill list
+
+    const billsList =
+        document.querySelector(".bills-list");
+
+
+    if (billsList && data.bills_html) {
+
+        billsList.innerHTML =
+            data.bills_html;
+
+
+        // The old elements were destroyed,
+        // so attach their editing behavior again.
+
+        initializeBillEditing();
+
+    }
+
+}
 
 
 // ----------------------------------------
@@ -204,372 +623,42 @@ function getCookie(name) {
 
 }
 
-// ----------------------------------------
-// Bill due date inline editing
-// ----------------------------------------
-
-const billDates = document.querySelectorAll(".bill-date");
-
-billDates.forEach(function (billDate) {
-
-    const display =
-        billDate.querySelector(".bill-date-display");
-
-    const input =
-        billDate.querySelector(".bill-date-input");
-
-
-    display.addEventListener("click", function (event) {
-
-        event.stopPropagation();
-
-        billDate.classList.add("editing");
-
-        input.focus();
-
-        // Open the native date picker when supported
-        if (input.showPicker) {
-            input.showPicker();
-        }
-
-    });
-
-
-    input.addEventListener("change", function () {
-
-        saveBillDate();
-
-    });
-
-
-    input.addEventListener("blur", function () {
-
-        billDate.classList.remove("editing");
-
-    });
-
-
-    function saveBillDate() {
-
-        const date = input.value;
-
-        if (!date) {
-            return;
-        }
-
-
-        const billId = billDate.dataset.billId;
-
-
-        fetch(`/bill/${billId}/date/`, {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type":
-                    "application/x-www-form-urlencoded",
-
-                "X-CSRFToken":
-                    getCookie("csrftoken")
-            },
-
-            body:
-                `due_date=${encodeURIComponent(date)}`
-
-        })
-
-        .then(function (response) {
-
-            return response.json();
-
-        })
-
-        .then(function (data) {
-
-            if (data.success) {
-
-                const parts = date.split("-");
-
-                const localDate = new Date(
-                    parts[0],
-                    parts[1] - 1,
-                    parts[2]
-                );
-
-                const formattedDate =
-                    localDate.toLocaleDateString(
-                        "en-US",
-                        {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric"
-                        }
-                    );
-
-                display.textContent =
-                    `Due ${formattedDate}`;
-
-                updateDashboard(data);
-
-            }
-
-            billDate.classList.remove("editing");
-
-        });
-
-    }
-
-});
 
 // ----------------------------------------
-// Bill frequency inline editing
+// Initial bill editing setup
 // ----------------------------------------
 
-const billFrequencies =
-    document.querySelectorAll(".bill-frequency");
-
-billFrequencies.forEach(function (billFrequency) {
-
-    const display =
-        billFrequency.querySelector(
-            ".bill-frequency-display"
-        );
-
-    const input =
-        billFrequency.querySelector(
-            ".bill-frequency-input"
-        );
-
-
-    display.addEventListener("click", function (event) {
-
-        event.stopPropagation();
-
-        billFrequency.classList.add("editing");
-
-        input.focus();
-
-    });
-
-
-    input.addEventListener("change", function () {
-
-        saveBillFrequency();
-
-    });
-
-
-    input.addEventListener("blur", function () {
-
-        billFrequency.classList.remove("editing");
-
-    });
-
-
-    function saveBillFrequency() {
-
-        const frequency = input.value;
-
-        const billId =
-            billFrequency.dataset.billId;
-
-
-        fetch(`/bill/${billId}/frequency/`, {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type":
-                    "application/x-www-form-urlencoded",
-
-                "X-CSRFToken":
-                    getCookie("csrftoken")
-            },
-
-            body:
-                `frequency=${encodeURIComponent(frequency)}`
-
-        })
-
-        .then(function (response) {
-
-            return response.json();
-
-        })
-
-        .then(function (data) {
-
-            if (data.success) {
-
-                display.textContent =
-                    input.options[input.selectedIndex].text;
-
-                updateDashboard(data);
-
-            }
-
-            billFrequency.classList.remove("editing");
-
-        });
-
-    }
-
-});
+initializeBillEditing();
 
 // ----------------------------------------
-// Bill name inline editing
+// Close Add Bill modal
 // ----------------------------------------
 
-const billNames =
-    document.querySelectorAll(".bill-name");
+if (addBillModal) {
 
-billNames.forEach(function (billName) {
+    addBillModal.addEventListener("click", function (event) {
 
-    const display =
-        billName.querySelector(".bill-name-display");
+        if (event.target === addBillModal) {
 
-    const input =
-        billName.querySelector(".bill-name-input");
-
-
-    // Click the name to edit
-
-    display.addEventListener("click", function (event) {
-
-        event.stopPropagation();
-
-        billName.classList.add("editing");
-
-        input.focus();
-        input.select();
-
-    });
-
-
-    // Press Enter to save
-
-    input.addEventListener("keydown", function (event) {
-
-        if (event.key === "Enter") {
-            saveBillName();
-        }
-
-
-        // Escape cancels
-
-        if (event.key === "Escape") {
-
-            input.value = input.defaultValue;
-
-            billName.classList.remove("editing");
+            addBillModal.classList.remove("show");
 
         }
 
     });
-
-
-    // Clicking away saves
-
-    input.addEventListener("blur", function () {
-
-        saveBillName();
-
-    });
-
-
-    function saveBillName() {
-
-        const name = input.value.trim();
-
-
-        // Don't allow an empty name
-
-        if (!name) {
-
-            input.value = input.defaultValue;
-
-            billName.classList.remove("editing");
-
-            return;
-
-        }
-
-
-        const billId =
-            billName.dataset.billId;
-
-
-        fetch(`/bill/${billId}/name/`, {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type":
-                    "application/x-www-form-urlencoded",
-
-                "X-CSRFToken":
-                    getCookie("csrftoken")
-            },
-
-            body:
-                `name=${encodeURIComponent(name)}`
-
-        })
-
-        .then(function (response) {
-
-            return response.json();
-
-        })
-
-        .then(function (data) {
-
-            if (data.success) {
-
-                display.textContent = name;
-
-                input.defaultValue = name;
-
-            }
-
-            billName.classList.remove("editing");
-
-        });
-
-    }
-
-});
-
-// ----------------------------------------
-// Update dashboard totals
-// ----------------------------------------
-
-function updateDashboard(data) {
-
-    if (!data.success) {
-        return;
-    }
-
-
-    const remainingAmount =
-        document.querySelector(".hero-amount");
-
-    if (remainingAmount) {
-
-        remainingAmount.textContent =
-            `$${parseFloat(data.remaining).toFixed(2)}`;
-
-    }
-
-
-    const totalBills =
-        document.querySelector(".bills-total");
-
-    if (totalBills) {
-
-        totalBills.textContent =
-            `-$${parseFloat(data.total_bills).toFixed(2)}`;
-
-    }
 
 }
+
+
+// ----------------------------------------
+// Escape key closes modal
+// ----------------------------------------
+
+document.addEventListener("keydown", function (event) {
+
+    if (event.key === "Escape" && addBillModal) {
+
+        addBillModal.classList.remove("show");
+
+    }
+
+});

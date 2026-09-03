@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
 from django.http import JsonResponse
 
 from .models import Income, Bill
@@ -50,6 +51,16 @@ def dashboard_json():
 
     dashboard = get_dashboard_data()
 
+    bills_html = render_to_string(
+        "budget/_bill_list.html",
+        {
+            "bill_occurrences": dashboard.get(
+                "bill_occurrences",
+                []
+            )
+        }
+    )
+
     return {
         "total_bills": str(
             dashboard.get("total_bills", 0)
@@ -57,6 +68,7 @@ def dashboard_json():
         "remaining": str(
             dashboard.get("remaining", 0)
         ),
+        "bills_html": bills_html,
     }
 
 def home(request):
@@ -115,34 +127,6 @@ def delete_bill(request, bill_id):
         bill.delete()
 
     return redirect("home")
-
-
-def edit_bill(request, bill_id):
-
-    bill = Bill.objects.get(id=bill_id)
-
-    if request.method == "POST":
-
-        form = BillForm(
-            request.POST,
-            instance=bill
-        )
-
-        if form.is_valid():
-            form.save()
-            return redirect("home")
-
-    else:
-        form = BillForm(instance=bill)
-
-    return render(
-        request,
-        "budget/edit_bill.html",
-        {
-            "form": form,
-            "bill": bill,
-        }
-    )
 
 def update_bill_amount(request, bill_id):
 

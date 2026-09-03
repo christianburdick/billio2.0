@@ -298,17 +298,6 @@ button:hover {
     opacity: 1;
 }
 
-.edit-button {
-    color: #1d1d1f;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.edit-button:hover {
-    text-decoration: underline;
-}
-
 .back-link {
     display: inline-block;
     margin-top: 20px;
@@ -393,10 +382,6 @@ button:hover {
         right: 20px;
         bottom: 84px;
     }
-}
-
-#add-bill-form {
-    display: none;
 }
 
 #update-pay-form {
@@ -529,4 +514,37 @@ button:hover {
 
 .bill-name-display {
     cursor: pointer;
+}
+
+/* ----------------------------------------
+   Modal
+---------------------------------------- */
+
+.modal {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.35);
+
+    z-index: 100;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal .form-section {
+    width: min(100%, 480px);
+    margin: 0;
+
+    max-height: 90vh;
+    overflow-y: auto;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
