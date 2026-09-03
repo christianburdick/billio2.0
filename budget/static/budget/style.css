@@ -338,3 +338,11 @@ button:hover {
         bottom: 84px;
     }
 }
+
+#add-bill-form {
+    display: none;
+}
+
+#update-pay-form {
+    display: none;
+}

@@ -1,233 +1,384 @@
 {% load static %}
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Billio</title>
+<title>Billio</title>
 
-    <link rel="stylesheet" href="{% static 'budget/style.css' %}">
+<link rel="stylesheet" href="{% static 'budget/style.css' %}">
+
 </head>
 
 <body>
 
 <div class="container">
 
-    <header class="header">
-        <h1>Billio</h1>
-        <p>Your money, organized.</p>
-    </header>
+<header class="header">
+    <h1>Billio</h1>
+    <p>Your money, organized.</p>
+</header>
 
 
-    {% if income %}
+{% if income %}
 
-        <!-- Current Pay Period -->
+    <!-- Current Pay Period -->
 
-        <section class="hero">
+    <section class="hero">
 
-            <div class="hero-label">
-                Remaining this pay period
+        <div class="hero-label">
+            Remaining this pay period
+        </div>
+
+        <div class="hero-amount">
+            ${{ remaining|floatformat:2 }}
+        </div>
+
+        <div class="pay-period">
+            {{ period_start }} — {{ period_end }}
+        </div>
+
+    </section>
+
+
+    <!-- Paycheck / Bills Summary -->
+
+    <section class="cards">
+
+        <div class="card">
+
+            <div class="card-label">
+                Paycheck
             </div>
 
-            <div class="hero-amount">
-                ${{ remaining|floatformat:2 }}
+            <div class="card-value">
+                ${{ income.amount|floatformat:2 }}
             </div>
 
-            <div class="pay-period">
-                {{ period_start }} — {{ period_end }}
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Bills
             </div>
 
-        </section>
-
-
-        <!-- Paycheck / Bills Summary -->
-
-        <section class="cards">
-
-            <div class="card">
-
-                <div class="card-label">
-                    Paycheck
-                </div>
-
-                <div class="card-value">
-                    ${{ income.amount|floatformat:2 }}
-                </div>
-
+            <div class="card-value">
+                -${{ total_bills|floatformat:2 }}
             </div>
 
+        </div>
 
-            <div class="card">
-
-                <div class="card-label">
-                    Bills
-                </div>
-
-                <div class="card-value">
-                    -${{ total_bills|floatformat:2 }}
-                </div>
-
-            </div>
-
-        </section>
+    </section>
 
 
-        <!-- Bills This Period -->
+    <!-- Bills This Period -->
 
-        <section class="bills-section">
+    <section class="bills-section">
 
-            <div class="section-title">
-                Bills this period
-            </div>
+        <div class="section-title">
+            Bills this period
+        </div>
 
 
-            {% for bill, occurrence_date in bill_occurrences %}
+        {% for bill, occurrence_date in bill_occurrences %}
 
-                <div class="bill">
+            <div class="bill">
 
-                    <div>
+                <div>
 
-                        <div class="bill-name">
-                            {{ bill.name }}
-                        </div>
-
-                        <div class="bill-date">
-                            Due {{ occurrence_date|date:"M j, Y" }}
-                        </div>
-
+                    <div class="bill-name">
+                        {{ bill.name }}
                     </div>
 
-
-                    <div class="bill-actions">
-
-                        <div class="bill-amount">
-                            ${{ bill.amount|floatformat:2 }}
-                        </div>
-
-
-                        <a
-                            href="{% url 'edit_bill' bill.id %}"
-                            class="edit-button"
-                        >
-                            Edit
-                        </a>
-
-
-                        <form
-                            method="POST"
-                            action="{% url 'delete_bill' bill.id %}"
-                            onsubmit="return confirm('Are you sure you want to delete this bill?');"
-                        >
-
-                            {% csrf_token %}
-
-                            <button
-                                type="submit"
-                                class="delete-button"
-                            >
-                                Delete
-                            </button>
-
-                        </form>
-
+                    <div class="bill-date">
+                        Due {{ occurrence_date|date:"M j, Y" }}
                     </div>
 
                 </div>
 
-            {% empty %}
 
-                <div class="empty">
-                    No bills in this pay period.
+                <div class="bill-actions">
+
+                    <div class="bill-amount">
+                        ${{ bill.amount|floatformat:2 }}
+                    </div>
+
+
+                    <a
+                        href="{% url 'edit_bill' bill.id %}"
+                        class="edit-button"
+                    >
+                        Edit
+                    </a>
+
+
+                    <form
+                        method="POST"
+                        action="{% url 'delete_bill' bill.id %}"
+                        onsubmit="return confirm('Are you sure you want to delete this bill?');"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="delete-button"
+                        >
+                            Delete
+                        </button>
+
+                    </form>
+
                 </div>
 
-            {% endfor %}
-
-        </section>
-
-    {% else %}
-
-        <!-- No Paycheck Yet -->
-
-        <section class="hero">
-
-            <div class="hero-label">
-                Welcome to Billio
             </div>
 
-            <div class="hero-amount">
-                $0.00
+        {% empty %}
+
+            <div class="empty">
+                No bills in this pay period.
             </div>
 
-            <div class="pay-period">
-                Add your paycheck to get started.
+        {% endfor %}
+
+    </section>
+
+
+    <!-- Add Bill -->
+
+    <section
+        class="form-section"
+        id="add-bill-form"
+    >
+
+        <div class="section-title">
+            Add Bill
+        </div>
+
+        <form
+            method="POST"
+            class="bill-form"
+        >
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="form_type"
+                value="bill"
+            >
+
+            <div class="form-field">
+
+                <label for="{{ bill_form.name.id_for_label }}">
+                    Bill Name
+                </label>
+
+                {{ bill_form.name }}
+
             </div>
 
-        </section>
 
+            <div class="form-field">
 
-        <!-- Add Pay check -->
+                <label for="{{ bill_form.amount.id_for_label }}">
+                    Amount
+                </label>
 
-        <section class="bills-section">
+                {{ bill_form.amount }}
 
-            <div class="section-title">
-                Add Your Paycheck
             </div>
 
-            <form method="POST">
 
-                {% csrf_token %}
+            <div class="form-field">
 
-                <input
-                    type="hidden"
-                    name="form_type"
-                    value="income"
-                >
+                <label for="{{ bill_form.due_date.id_for_label }}">
+                    Due Date
+                </label>
 
-                {{ income_form.as_p }}
+                {{ bill_form.due_date }}
 
-                <button type="submit">
-                    Save Paycheck
-                </button>
+            </div>
 
-            </form>
 
-        </section>
+            <div class="form-field">
 
-    {% endif %}
+                <label for="{{ bill_form.frequency.id_for_label }}">
+                    Frequency
+                </label>
+
+                {{ bill_form.frequency }}
+
+            </div>
+
+
+            <button type="submit">
+                Add Bill
+            </button>
+
+        </form>
+
+    </section>
+
+    <section
+        class="form-section"
+        id="update-pay-form"
+    >
+
+        <div class="section-title">
+            Update Paycheck
+        </div>
+
+        <form
+            method="POST"
+            class="bill-form"
+        >
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="form_type"
+                value="income"
+            >
+
+            <div class="form-field">
+
+                <label for="{{ income_form.amount.id_for_label }}">
+                    Pay Amount
+                </label>
+
+                {{ income_form.amount }}
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="{{ income_form.pay_date.id_for_label }}">
+                    Pay Date
+                </label>
+
+                {{ income_form.pay_date }}
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="{{ income_form.frequency.id_for_label }}">
+                    Pay Frequency
+                </label>
+
+                {{ income_form.frequency }}
+
+            </div>
+
+
+            <button type="submit">
+                Update Paycheck
+            </button>
+
+        </form>
+
+    </section>
+
+{% else %}
+
+    <!-- No Paycheck Yet -->
+
+    <section class="hero">
+
+        <div class="hero-label">
+            Welcome to Billio
+        </div>
+
+        <div class="hero-amount">
+            $0.00
+        </div>
+
+        <div class="pay-period">
+            Add your paycheck to get started.
+        </div>
+
+    </section>
+
+
+    <!-- Add Paycheck -->
+
+    <section class="bills-section">
+
+        <div class="section-title">
+            Add Your Paycheck
+        </div>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="form_type"
+                value="income"
+            >
+
+            {{ income_form.as_p }}
+
+            <button type="submit">
+                Save Paycheck
+            </button>
+
+        </form>
+
+    </section>
+
+{% endif %}
+
+
+<!-- Floating Action Button -->
+
+<button
+    class="floating-action"
+    type="button"
+    id="add-button"
+    aria-label="Open actions"
+>
+    +
+</button>
+
+
+<!-- Action Menu -->
+
+<div
+    class="action-menu"
+    id="action-menu"
+>
 
     <button
-        class="floating-action"
         type="button"
-        id="add-button"
+        id="add-bill-button"
     >
-        +
+        Add Bill
     </button>
 
-    <div class="action-menu" id="action-menu">
-
-        <button type="button" id="add-bill-button">
-            Add Bill
-        </button>
-
-        <button type="button" id="update-pay-button">
-            Update Paycheck
-        </button>
-
-    </div>
+    <button
+        type="button"
+        id="update-pay-button"
+    >
+        Update Paycheck
+    </button>
 
 </div>
 
-<script>
-    const addButton = document.getElementById("add-button");
-    const actionMenu = document.getElementById("action-menu");
+</div>
 
-    addButton.addEventListener("click", function () {
-        actionMenu.classList.toggle("show");
-    });
-</script>
+<script src="{% static 'budget/script.js' %}"></script>
 
 </body>
 
