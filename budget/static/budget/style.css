@@ -544,3 +544,12 @@ button:hover {
 
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
+
+.paycheck-card {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.paycheck-card:hover {
+    transform: translateY(-2px);
+}

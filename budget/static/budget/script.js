@@ -9,6 +9,9 @@ const addBillModal =
 const updatePayButton =
     document.getElementById("update-pay-button");
 
+const paycheckCard =
+    document.getElementById("paycheck-card");
+
 const updatePayForm =
     document.getElementById("update-pay-form");
 
@@ -53,16 +56,41 @@ if (addBillButton && addBillModal) {
 // Show Update Paycheck form
 // ----------------------------------------
 
-if (updatePayButton && updatePayModal) {
+if (updatePayModal) {
 
-    updatePayButton.addEventListener("click", function () {
+    function openUpdatePaycheck() {
 
-        actionMenu.classList.remove("show");
-        addButton.classList.remove("open");
+        if (actionMenu) {
+            actionMenu.classList.remove("show");
+        }
+
+        if (addButton) {
+            addButton.classList.remove("open");
+        }
 
         updatePayModal.classList.add("show");
 
-    });
+    }
+
+
+    if (updatePayButton) {
+
+        updatePayButton.addEventListener(
+            "click",
+            openUpdatePaycheck
+        );
+
+    }
+
+
+    if (paycheckCard) {
+
+        paycheckCard.addEventListener(
+            "click",
+            openUpdatePaycheck
+        );
+
+    }
 
 }
 
