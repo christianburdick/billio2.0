@@ -146,6 +146,76 @@
 
         </section>
 
+        <!-- Manage All Bills -->
+
+        <section class="bills-section">
+
+            <div class="section-title">
+                All Bills
+            </div>
+
+
+            {% for bill in bills %}
+
+                <div class="bill">
+
+                    <div>
+
+                        <div class="bill-name">
+                            {{ bill.name }}
+                        </div>
+
+                        <div class="bill-date">
+                            Due {{ bill.due_date }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="bill-actions">
+
+                        <div class="bill-amount">
+                            ${{ bill.amount }}
+                        </div>
+
+
+                        <a
+                            href="{% url 'edit_bill' bill.id %}"
+                            class="edit-button"
+                        >
+                            Edit
+                        </a>
+
+
+                        <form
+                            method="POST"
+                            action="{% url 'delete_bill' bill.id %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="delete-button"
+                            >
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <div class="empty">
+                    No bills added yet.
+                </div>
+
+            {% endfor %}
+
+        </section>
 
         <!-- Add Bill -->
 
