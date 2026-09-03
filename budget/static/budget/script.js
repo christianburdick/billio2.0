@@ -8,10 +8,15 @@ const updatePayButton = document.getElementById("update-pay-button");
 const updatePayForm = document.getElementById("update-pay-form");
 
 
+// Open / close action menu
+
 addButton.addEventListener("click", function () {
     actionMenu.classList.toggle("show");
+    addButton.classList.toggle("open");
 });
 
+
+// Show Add Bill form
 
 addBillButton.addEventListener("click", function () {
     actionMenu.classList.remove("show");
@@ -20,8 +25,36 @@ addBillButton.addEventListener("click", function () {
 });
 
 
+// Show Update Paycheck form
+
 updatePayButton.addEventListener("click", function () {
     actionMenu.classList.remove("show");
 
     updatePayForm.style.display = "block";
+});
+
+
+// Expand / collapse bill actions
+
+const bills = document.querySelectorAll(".bill");
+
+bills.forEach(function (bill) {
+
+    bill.addEventListener("click", function () {
+        bill.classList.toggle("selected");
+    });
+
+});
+
+
+// Prevent Edit / Delete clicks from toggling the bill
+
+const billDetailActions = document.querySelectorAll(".bill-detail-actions");
+
+billDetailActions.forEach(function (actions) {
+
+    actions.addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
+
 });
