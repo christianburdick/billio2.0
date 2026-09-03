@@ -1,0 +1,111 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Bill — Billio</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'budget/style.css' %}"
+    >
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+        <h1>Edit Bill</h1>
+        <p>Update your bill information.</p>
+    </header>
+
+
+    <section class="form-section">
+
+        <div class="section-title">
+            {{ bill.name }}
+        </div>
+
+
+        <form
+            method="POST"
+            class="bill-form"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="form-field">
+
+                <label for="{{ form.name.id_for_label }}">
+                    Bill Name
+                </label>
+
+                {{ form.name }}
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="{{ form.amount.id_for_label }}">
+                    Amount
+                </label>
+
+                {{ form.amount }}
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="{{ form.due_date.id_for_label }}">
+                    Due Date
+                </label>
+
+                {{ form.due_date }}
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="{{ form.frequency.id_for_label }}">
+                    Frequency
+                </label>
+
+                {{ form.frequency }}
+
+            </div>
+
+
+            <button type="submit">
+                Save Changes
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <a
+        href="{% url 'home' %}"
+        class="back-link"
+    >
+        ← Back to Billio
+    </a>
+
+</div>
+
+</body>
+
+</html>
