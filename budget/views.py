@@ -78,17 +78,17 @@ def dashboard_json():
 
     dashboard = get_dashboard_data()
 
-    bills_in_period = {
-        bill.id
-        for bill, occurrence_date
-        in dashboard.get("bill_occurrences", [])
-    }
-
     bills_html = render_to_string(
         "budget/_bill_list.html",
         {
-            "bills": dashboard.get("bills", []),
-            "bills_in_period": bills_in_period,
+            "bill_occurrences": dashboard.get(
+                "bill_occurrences",
+                []
+            ),
+            "bills_outside_period": dashboard.get(
+                "bills_outside_period",
+                []
+            ),
         }
     )
 
