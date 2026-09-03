@@ -95,7 +95,7 @@
                         </div>
 
                         <div class="bill-date">
-                            Due {{ occurrence_date }}
+                            Due {{ occurrence_date|date:"M j, Y" }}
                         </div>
 
                     </div>
@@ -119,6 +119,7 @@
                         <form
                             method="POST"
                             action="{% url 'delete_bill' bill.id %}"
+                            onsubmit="return confirm('Are you sure you want to delete this bill?');"
                         >
 
                             {% csrf_token %}
@@ -151,7 +152,11 @@
         <section class="bills-section">
 
             <div class="section-title">
-                All Bills
+                Manage Bills
+            </div>
+
+            <div class="section-description">
+                All of your recurring and one-time bills.
             </div>
 
 
@@ -166,7 +171,7 @@
                         </div>
 
                         <div class="bill-date">
-                            Due {{ bill.due_date }}
+                            {{ bill.get_frequency_display }} · Due {{ bill.due_date|date:"M j, Y" }}
                         </div>
 
                     </div>
@@ -190,6 +195,7 @@
                         <form
                             method="POST"
                             action="{% url 'delete_bill' bill.id %}"
+                            onsubmit="return confirm('Are you sure you want to delete this bill?');"
                         >
 
                             {% csrf_token %}

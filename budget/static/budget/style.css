@@ -95,6 +95,13 @@ body {
     margin-bottom: 20px;
 }
 
+.section-description {
+    color: #86868b;
+    font-size: 15px;
+    margin-top: -12px;
+    margin-bottom: 20px;
+}
+
 .bill {
     display: flex;
     justify-content: space-between;
