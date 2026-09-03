@@ -5,12 +5,20 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Bill.io</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<link rel="stylesheet" href="{% static 'budget/style.css' %}">
+    <title>Bill.io</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'budget/style.css' %}"
+    >
 
 </head>
 
@@ -19,11 +27,16 @@
 <div class="container">
 
 <header class="header">
+
     <h1>Bill.io</h1>
+
     <p>Your money, organized.</p>
+
 </header>
 
+
 {% if income %}
+
 
 <!-- Current Pay Period -->
 
@@ -48,23 +61,32 @@
 
 <section class="cards">
 
-    <div class="card paycheck-card" id="paycheck-card">
-        <div class="card-label">Paycheck</div>
+    <div
+        class="card paycheck-card"
+        id="paycheck-card"
+    >
+
+        <div class="card-label">
+            Paycheck
+        </div>
+
         <div class="card-value">
             ${{ income.amount|floatformat:2 }}
         </div>
+
     </div>
 
 
-    <div class="card">
+    <div
+        class="card"
+        id="bills-card"
+    >
 
         <div class="card-label">
             Bills
         </div>
 
-        <div
-            class="card-value bills-total"
-        >
+        <div class="card-value bills-total">
             -${{ total_bills|floatformat:2 }}
         </div>
 
@@ -82,94 +104,12 @@
     </div>
 
     <div class="bills-list">
+
         {% include "budget/_bill_list.html" %}
+
     </div>
 
 </section>
-
-
-<!-- Add Bill -->
-
-<div
-    id="add-bill-modal"
-    class="modal"
->
-
-    <section
-        id="add-bill-form"
-        class="form-section"
-    >
-
-        <div class="section-title">
-            Add Bill
-        </div>
-
-        <form
-            method="POST"
-            class="bill-form"
-        >
-
-            {% csrf_token %}
-
-            <input
-                type="hidden"
-                name="form_type"
-                value="bill"
-            >
-
-            <div class="form-field">
-
-                <label for="{{ bill_form.name.id_for_label }}">
-                    Bill Name
-                </label>
-
-                {{ bill_form.name }}
-
-            </div>
-
-
-            <div class="form-field">
-
-                <label for="{{ bill_form.amount.id_for_label }}">
-                    Amount
-                </label>
-
-                {{ bill_form.amount }}
-
-            </div>
-
-
-            <div class="form-field">
-
-                <label for="{{ bill_form.due_date.id_for_label }}">
-                    Due Date
-                </label>
-
-                {{ bill_form.due_date }}
-
-            </div>
-
-
-            <div class="form-field">
-
-                <label for="{{ bill_form.frequency.id_for_label }}">
-                    Frequency
-                </label>
-
-                {{ bill_form.frequency }}
-
-            </div>
-
-
-            <button type="submit">
-                Add Bill
-            </button>
-
-        </form>
-
-    </section>
-
-</div>
 
 
 <!-- Update Paycheck -->
@@ -188,6 +128,7 @@
             Update Paycheck
         </div>
 
+
         <form
             method="POST"
             class="bill-form"
@@ -195,15 +136,19 @@
 
             {% csrf_token %}
 
+
             <input
                 type="hidden"
                 name="form_type"
                 value="income"
             >
 
+
             <div class="form-field">
 
-                <label for="{{ income_form.amount.id_for_label }}">
+                <label
+                    for="{{ income_form.amount.id_for_label }}"
+                >
                     Paycheck
                 </label>
 
@@ -214,7 +159,9 @@
 
             <div class="form-field">
 
-                <label for="{{ income_form.pay_date.id_for_label }}">
+                <label
+                    for="{{ income_form.pay_date.id_for_label }}"
+                >
                     Pay date
                 </label>
 
@@ -225,7 +172,9 @@
 
             <div class="form-field">
 
-                <label for="{{ income_form.frequency.id_for_label }}">
+                <label
+                    for="{{ income_form.frequency.id_for_label }}"
+                >
                     Frequency
                 </label>
 
@@ -244,7 +193,9 @@
 
 </div>
 
+
 {% else %}
+
 
 <!-- No Paycheck Yet -->
 
@@ -273,9 +224,11 @@
         Add Your Paycheck
     </div>
 
+
     <form method="POST">
 
         {% csrf_token %}
+
 
         <input
             type="hidden"
@@ -283,7 +236,9 @@
             value="income"
         >
 
+
         {{ income_form.as_p }}
+
 
         <button type="submit">
             Save Paycheck
@@ -293,44 +248,9 @@
 
 </section>
 
+
 {% endif %}
 
-<!-- Floating Action Button -->
-
-<button
-class="floating-action"
-type="button"
-id="add-button"
-aria-label="Open actions"
-
->
-+
-</button>
-
-<!-- Action Menu -->
-
-<div
-    class="action-menu"
-    id="action-menu"
->
-
-<button
-    type="button"
-    id="add-bill-button"
->
-    Add Bill
-</button>
-
-<button
-    type="button"
-    id="update-pay-button"
->
-    Update Paycheck
-</button>
-
-</div>
-
-</div>
 
 <script src="{% static 'budget/script.js' %}"></script>
 

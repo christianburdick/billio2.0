@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+from datetime import date
 from decimal import Decimal, InvalidOperation
 
 from .models import Income, Bill
@@ -289,3 +290,24 @@ def update_bill_date(request, bill_id):
     return JsonResponse({
         "success": False
     })
+
+def add_bill(request):
+
+    if request.method == "POST":
+
+        bill = Bill.objects.create(
+            name="",
+            amount=Decimal("0.00"),
+            due_date=date.today(),
+            frequency="one_time",
+        )
+
+        return JsonResponse({
+            "success": True,
+            **dashboard_json(),
+            "new_bill_id": bill.id,
+        })
+
+    return JsonResponse({
+        "success": False,
+    }, status=405)
