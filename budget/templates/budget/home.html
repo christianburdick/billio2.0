@@ -147,188 +147,6 @@
 
         </section>
 
-        <!-- Manage All Bills -->
-
-        <section class="bills-section">
-
-            <div class="section-title">
-                Manage Bills
-            </div>
-
-            <div class="section-description">
-                All of your recurring and one-time bills.
-            </div>
-
-
-            {% for bill in bills %}
-
-                <div class="bill">
-
-                    <div>
-
-                        <div class="bill-name">
-                            {{ bill.name }}
-                        </div>
-
-                        <div class="bill-date">
-                            {{ bill.get_frequency_display }} · Due {{ bill.due_date|date:"M j, Y" }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="bill-actions">
-
-                        <div class="bill-amount">
-                            ${{ bill.amount }}
-                        </div>
-
-
-                        <a
-                            href="{% url 'edit_bill' bill.id %}"
-                            class="edit-button"
-                        >
-                            Edit
-                        </a>
-
-
-                        <form
-                            method="POST"
-                            action="{% url 'delete_bill' bill.id %}"
-                            onsubmit="return confirm('Are you sure you want to delete this bill?');"
-                        >
-
-                            {% csrf_token %}
-
-                            <button
-                                type="submit"
-                                class="delete-button"
-                            >
-                                Delete
-                            </button>
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-            {% empty %}
-
-                <div class="empty">
-                    No bills added yet.
-                </div>
-
-            {% endfor %}
-
-        </section>
-
-        <!-- Add Bill -->
-
-        <section class="form-section">
-
-            <div class="section-title">
-                Add a Bill
-            </div>
-
-            <form method="POST" class="bill-form">
-
-                {% csrf_token %}
-
-                <input
-                    type="hidden"
-                    name="form_type"
-                    value="bill"
-                >
-
-                <div class="form-field">
-                    <label for="{{ bill_form.name.id_for_label }}">
-                        Bill Name
-                    </label>
-
-                    {{ bill_form.name }}
-                </div>
-
-                <div class="form-field">
-                    <label for="{{ bill_form.amount.id_for_label }}">
-                        Amount
-                    </label>
-
-                    {{ bill_form.amount }}
-                </div>
-
-                <div class="form-field">
-                    <label for="{{ bill_form.due_date.id_for_label }}">
-                        Due Date
-                    </label>
-
-                    {{ bill_form.due_date }}
-                </div>
-
-                <div class="form-field">
-                    <label for="{{ bill_form.frequency.id_for_label }}">
-                        Frequency
-                    </label>
-
-                    {{ bill_form.frequency }}
-                </div>
-
-                <button type="submit">
-                    Add Bill
-                </button>
-
-            </form>
-
-        </section>
-
-        <section class="form-section">
-
-            <div class="section-title">
-                Update Paycheck
-            </div>
-
-            <form method="POST" class="bill-form">
-
-                {% csrf_token %}
-
-                <input
-                    type="hidden"
-                    name="form_type"
-                    value="income"
-                >
-
-                <div class="form-field">
-                    <label for="{{ income_form.amount.id_for_label }}">
-                        Pay Amount
-                    </label>
-
-                    {{ income_form.amount }}
-                </div>
-
-                <div class="form-field">
-                    <label for="{{ income_form.pay_date.id_for_label }}">
-                        Pay Date
-                    </label>
-
-                    {{ income_form.pay_date }}
-                </div>
-
-                <div class="form-field">
-                    <label for="{{ income_form.frequency.id_for_label }}">
-                        Pay Frequency
-                    </label>
-
-                    {{ income_form.frequency }}
-                </div>
-
-                <button type="submit">
-                    Update Paycheck
-                </button>
-
-            </form>
-
-        </section>
-
     {% else %}
 
         <!-- No Paycheck Yet -->
@@ -380,8 +198,36 @@
 
     {% endif %}
 
+    <button
+        class="floating-action"
+        type="button"
+        id="add-button"
+    >
+        +
+    </button>
+
+    <div class="action-menu" id="action-menu">
+
+        <button type="button" id="add-bill-button">
+            Add Bill
+        </button>
+
+        <button type="button" id="update-pay-button">
+            Update Paycheck
+        </button>
+
+    </div>
 
 </div>
+
+<script>
+    const addButton = document.getElementById("add-button");
+    const actionMenu = document.getElementById("action-menu");
+
+    addButton.addEventListener("click", function () {
+        actionMenu.classList.toggle("show");
+    });
+</script>
 
 </body>
 
