@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+from decimal import Decimal, InvalidOperation
 
 from .models import Income, Bill
 from .forms import IncomeForm, BillForm
@@ -19,6 +20,8 @@ def get_dashboard_data():
         return {
             "income": None,
             "bills": bills,
+            "bills_in_period": [],
+            "bills_outside_period": bills,
         }
 
     period_start, period_end = get_pay_period(
@@ -37,12 +40,36 @@ def get_dashboard_data():
         bill_occurrences
     )
 
+    bills_in_period = {
+        bill.id
+        for bill, occurrence_date in bill_occurrences
+    }
+
+    bills_in_period_list = sorted(
+        [
+            (bill, occurrence_date)
+            for bill, occurrence_date in bill_occurrences
+        ],
+        key=lambda item: item[1]
+    )
+
+    bills_outside_period = sorted(
+        [
+            bill
+            for bill in bills
+            if bill.id not in bills_in_period
+        ],
+        key=lambda bill: bill.due_date
+    )
+
     return {
         "income": income,
         "bills": bills,
         "period_start": period_start,
         "period_end": period_end,
-        "bill_occurrences": bill_occurrences,
+        "bill_occurrences": bills_in_period_list,
+        "bills_in_period": bills_in_period,
+        "bills_outside_period": bills_outside_period,
         "total_bills": total_bills,
         "remaining": remaining,
     }
@@ -51,13 +78,17 @@ def dashboard_json():
 
     dashboard = get_dashboard_data()
 
+    bills_in_period = {
+        bill.id
+        for bill, occurrence_date
+        in dashboard.get("bill_occurrences", [])
+    }
+
     bills_html = render_to_string(
         "budget/_bill_list.html",
         {
-            "bill_occurrences": dashboard.get(
-                "bill_occurrences",
-                []
-            )
+            "bills": dashboard.get("bills", []),
+            "bills_in_period": bills_in_period,
         }
     )
 
@@ -101,9 +132,16 @@ def home(request):
 
     dashboard = get_dashboard_data()
 
+    bills_in_period = {
+        bill.id
+        for bill, occurrence_date
+        in dashboard.get("bill_occurrences", [])
+    }
+
     context = {
         "income": dashboard["income"],
         "bills": dashboard["bills"],
+        "bills_in_period": bills_in_period,
         "income_form": IncomeForm(),
         "bill_form": BillForm(),
     }
@@ -134,17 +172,41 @@ def update_bill_amount(request, bill_id):
 
         bill = Bill.objects.get(id=bill_id)
 
-        amount = request.POST.get("amount")
+        amount = request.POST.get("amount", "").strip()
 
-        if amount:
-
-            bill.amount = amount
-            bill.save()
-
+        try:
+            amount = Decimal(amount)
+        except (InvalidOperation, ValueError):
             return JsonResponse({
-                "success": True,
-                **dashboard_json(),
+                "success": False,
+                "error": "Invalid amount"
             })
+
+        if amount < Decimal("0"):
+            return JsonResponse({
+                "success": False,
+                "error": "Amount cannot be negative"
+            })
+
+        if amount > Decimal("99999999.99"):
+            return JsonResponse({
+                "success": False,
+                "error": "Amount is too large"
+            })
+
+        if amount.as_tuple().exponent < -2:
+            return JsonResponse({
+                "success": False,
+                "error": "Amount can have at most 2 decimal places"
+            })
+
+        bill.amount = amount
+        bill.save()
+
+        return JsonResponse({
+            "success": True,
+            **dashboard_json(),
+        })
 
     return JsonResponse({
         "success": False

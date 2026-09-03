@@ -185,6 +185,10 @@ body {
     border-bottom: none;
 }
 
+.bill-outside-period {
+    opacity: 0.4;
+}
+
 
 /* ----------------------------------------
    Bill Primary Row
@@ -410,14 +414,17 @@ body {
 .bill-date-input {
     display: none;
 
+    width: auto;
+
     border: none;
-    border-bottom: 1px solid #1d1d1f;
+    border-bottom: 1px solid #d2d2d7;
 
     padding: 0;
     margin: 0;
 
     font-family: inherit;
     font-size: 14px;
+    line-height: normal;
 
     color: #1d1d1f;
 
@@ -432,6 +439,10 @@ body {
 
 .bill-date.editing .bill-date-input {
     display: inline-block;
+}
+
+.bill-date-input:focus {
+    border-bottom-color: #a1a1a6;
 }
 
 /* ----------------------------------------
