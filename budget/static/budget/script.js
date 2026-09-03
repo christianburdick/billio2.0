@@ -6,9 +6,14 @@ const addBillForm = document.getElementById("add-bill-form");
 const addBillModal =
     document.getElementById("add-bill-modal");
 
-const updatePayButton = document.getElementById("update-pay-button");
-const updatePayForm = document.getElementById("update-pay-form");
+const updatePayButton =
+    document.getElementById("update-pay-button");
 
+const updatePayForm =
+    document.getElementById("update-pay-form");
+
+const updatePayModal =
+    document.getElementById("update-pay-modal");
 
 // ----------------------------------------
 // Floating action menu
@@ -48,14 +53,14 @@ if (addBillButton && addBillModal) {
 // Show Update Paycheck form
 // ----------------------------------------
 
-if (updatePayButton && updatePayForm) {
+if (updatePayButton && updatePayModal) {
 
     updatePayButton.addEventListener("click", function () {
 
         actionMenu.classList.remove("show");
         addButton.classList.remove("open");
 
-        updatePayForm.style.display = "block";
+        updatePayModal.classList.add("show");
 
     });
 
@@ -648,6 +653,23 @@ if (addBillModal) {
 
 }
 
+// ----------------------------------------
+// Close Update Paycheck modal
+// ----------------------------------------
+
+if (updatePayModal) {
+
+    updatePayModal.addEventListener("click", function (event) {
+
+        if (event.target === updatePayModal) {
+
+            updatePayModal.classList.remove("show");
+
+        }
+
+    });
+
+}
 
 // ----------------------------------------
 // Escape key closes modal
@@ -655,9 +677,15 @@ if (addBillModal) {
 
 document.addEventListener("keydown", function (event) {
 
-    if (event.key === "Escape" && addBillModal) {
+    if (event.key === "Escape") {
 
-        addBillModal.classList.remove("show");
+        if (addBillModal) {
+            addBillModal.classList.remove("show");
+        }
+
+        if (updatePayModal) {
+            updatePayModal.classList.remove("show");
+        }
 
     }
 

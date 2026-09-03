@@ -158,68 +158,66 @@
 
     </div>
 
-    <section
-        class="form-section"
-        id="update-pay-form"
-    >
+    <div id="update-pay-modal" class="modal">
 
-        <div class="section-title">
-            Update Paycheck
-        </div>
+        <section id="update-pay-form" class="form-section">
 
-        <form
-            method="POST"
-            class="bill-form"
-        >
-
-            {% csrf_token %}
-
-            <input
-                type="hidden"
-                name="form_type"
-                value="income"
-            >
-
-            <div class="form-field">
-
-                <label for="{{ income_form.amount.id_for_label }}">
-                    Pay Amount
-                </label>
-
-                {{ income_form.amount }}
-
-            </div>
-
-
-            <div class="form-field">
-
-                <label for="{{ income_form.pay_date.id_for_label }}">
-                    Pay Date
-                </label>
-
-                {{ income_form.pay_date }}
-
-            </div>
-
-
-            <div class="form-field">
-
-                <label for="{{ income_form.frequency.id_for_label }}">
-                    Pay Frequency
-                </label>
-
-                {{ income_form.frequency }}
-
-            </div>
-
-
-            <button type="submit">
+            <div class="section-title">
                 Update Paycheck
-            </button>
+            </div>
 
-        </form>
+            <form method="POST" class="bill-form">
 
-    </section>
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="form_type"
+                    value="income"
+                >
+
+                <div class="form-field">
+
+                    <label for="{{ income_form.amount.id_for_label }}">
+                        Paycheck
+                    </label>
+
+                    {{ income_form.amount }}
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="{{ income_form.pay_date.id_for_label }}">
+                        Pay date
+                    </label>
+
+                    {{ income_form.pay_date }}
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="{{ income_form.frequency.id_for_label }}">
+                        Frequency
+                    </label>
+
+                    {{ income_form.frequency }}
+
+                </div>
+
+
+                <button type="submit">
+                    Save
+                </button>
+
+            </form>
+
+        </section>
+
+    </div>
 
 {% else %}
 

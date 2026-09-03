@@ -384,10 +384,6 @@ button:hover {
     }
 }
 
-#update-pay-form {
-    display: none;
-}
-
 .floating-action {
     transition: transform 0.2s ease;
 }
