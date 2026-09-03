@@ -176,6 +176,8 @@ body {
 ---------------------------------------- */
 
 .bill {
+    position: relative;
+
     padding: 18px 0;
 
     border-bottom: 1px solid #f0f0f0;
@@ -234,60 +236,6 @@ body {
 .bill-name-input {
     display: none;
 
-    width: 100%;
-
-    border: none;
-    border-bottom: 1px solid #1d1d1f;
-
-    padding: 2px 0;
-
-    font-family: inherit;
-    font-size: 17px;
-    font-weight: 500;
-
-    color: #1d1d1f;
-
-    background: transparent;
-
-    outline: none;
-}
-
-.bill-name.editing .bill-name-display {
-    display: none;
-}
-
-.bill-name.editing .bill-name-input {
-    display: block;
-}
-
-
-/* ----------------------------------------
-   Bill Amount
----------------------------------------- */
-
-.bill-amount {
-    flex-shrink: 0;
-
-    text-align: right;
-}
-
-.bill-amount-display {
-    font-size: 17px;
-    font-weight: 600;
-
-    white-space: nowrap;
-
-    cursor: pointer;
-}
-
-
-/* ----------------------------------------
-   Inline Editing — Name
----------------------------------------- */
-
-.bill-name-input {
-    display: none;
-
     width: auto;
 
     min-width: 1ch;
@@ -317,6 +265,50 @@ body {
 
 .bill-name.editing .bill-name-input {
     display: inline-block;
+}
+
+
+/* ----------------------------------------
+   Inline Editing — Name Focus
+---------------------------------------- */
+
+.bill-name-input:focus {
+    border-bottom-color: #a1a1a6;
+}
+
+
+/* ----------------------------------------
+   Bill Amount Area
+---------------------------------------- */
+
+.bill-amount-area {
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    flex-shrink: 0;
+}
+
+
+/* ----------------------------------------
+   Bill Amount
+---------------------------------------- */
+
+.bill-amount {
+    flex-shrink: 0;
+
+    text-align: right;
+}
+
+.bill-amount-display {
+    font-size: 17px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    cursor: pointer;
 }
 
 
@@ -362,9 +354,68 @@ body {
    Active Inline Input
 ---------------------------------------- */
 
-.bill-name-input:focus,
 .bill-amount-input:focus {
     border-bottom-color: #a1a1a6;
+}
+
+
+/* ----------------------------------------
+   Bill Delete X
+---------------------------------------- */
+
+.bill .bill-delete {
+    display: none;
+
+    position: static;
+
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: transparent;
+    color: #86868b;
+
+    font-family: inherit;
+
+    font-size: 22px;
+    font-weight: 400;
+
+    line-height: 28px;
+
+    cursor: pointer;
+
+    flex-shrink: 0;
+}
+
+.bill.selected .bill-delete {
+    display: block;
+}
+
+.bill .bill-delete:hover {
+    background: #f5f5f7;
+
+    color: #1d1d1f;
+
+    opacity: 1;
+}
+
+
+/* ----------------------------------------
+   Delete Confirmation
+---------------------------------------- */
+
+.bill .bill-delete.delete-confirm {
+    color: #1d1d1f;
+
+    background: #f5f5f7;
+}
+
+.bill .bill-delete.delete-confirm:hover {
+    background: #e5e5e7;
 }
 
 
@@ -373,17 +424,19 @@ body {
 ---------------------------------------- */
 
 .bill-details {
-    display: flex;
-
-    align-items: center;
+    display: none;
 
     gap: 8px;
 
-    margin-top: 5px;
-
-    color: #86868b;
+    margin-top: 6px;
 
     font-size: 14px;
+
+    color: #86868b;
+}
+
+.bill.selected .bill-details {
+    display: flex;
 }
 
 .bill-details > * + *::before {
@@ -445,6 +498,7 @@ body {
     border-bottom-color: #a1a1a6;
 }
 
+
 /* ----------------------------------------
    Bill Frequency
 ---------------------------------------- */
@@ -493,6 +547,16 @@ body {
 
 .empty {
     color: #86868b;
+}
+
+.empty-bills {
+    padding: 32px 0;
+
+    text-align: center;
+
+    color: #86868b;
+
+    font-size: 15px;
 }
 
 
@@ -767,6 +831,24 @@ button:hover {
 
 
 /* ----------------------------------------
+   Bill Group Label
+---------------------------------------- */
+
+.bill-group-label {
+    margin-top: 18px;
+    padding: 18px 0 8px;
+
+    color: #86868b;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+/* ----------------------------------------
    Mobile
 ---------------------------------------- */
 
@@ -837,6 +919,17 @@ button:hover {
     }
 
 
+    .bill .bill-delete {
+        position: static;
+
+        width: 28px;
+        height: 28px;
+
+        font-size: 22px;
+        line-height: 28px;
+    }
+
+
     .floating-action {
         right: 20px;
         bottom: 20px;
@@ -867,17 +960,4 @@ button:hover {
 
         border-radius: 24px 24px 0 0;
     }
-}
-
-.bill-group-label {
-    margin-top: 18px;
-    padding: 18px 0 8px;
-
-    color: #86868b;
-
-    font-size: 12px;
-    font-weight: 500;
-
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }

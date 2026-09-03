@@ -123,6 +123,10 @@ if (updatePayModal) {
 
 function initializeBillEditing() {
 
+    initializeBillSelection();
+
+    initializeBillDeletion();
+
     initializeBillAmounts();
 
     initializeBillDates();
@@ -133,6 +137,148 @@ function initializeBillEditing() {
 
 }
 
+
+// ----------------------------------------
+// Bill selection
+// ----------------------------------------
+
+function initializeBillSelection() {
+
+    const bills =
+        document.querySelectorAll(".bill");
+
+
+    bills.forEach(function (bill) {
+
+        bill.addEventListener("click", function (event) {
+
+            // Do not let clicking the delete X
+            // trigger row selection.
+
+            if (event.target.closest(".bill-delete")) {
+                return;
+            }
+
+
+            // If this bill is already selected,
+            // clicking it again deselects it.
+
+            if (bill.classList.contains("selected")) {
+
+                bill.classList.remove("selected");
+
+                return;
+            }
+
+
+            // Remove selection from every other bill.
+
+            document
+                .querySelectorAll(".bill.selected")
+                .forEach(function (selectedBill) {
+
+                    selectedBill.classList.remove("selected");
+
+                });
+
+
+            // Select this bill.
+
+            bill.classList.add("selected");
+
+        });
+
+    });
+
+}
+
+function initializeBillDeletion() {
+
+    const deleteButtons =
+        document.querySelectorAll(".bill-delete");
+
+
+    deleteButtons.forEach(function (button) {
+
+        button.addEventListener("click", function (event) {
+
+            event.stopPropagation();
+
+
+            const bill =
+                button.closest(".bill");
+
+
+            if (!bill) {
+                return;
+            }
+
+
+            // First click arms the delete button.
+
+            if (!button.classList.contains("delete-confirm")) {
+
+                // Remove confirmation from any other bill.
+
+                document
+                    .querySelectorAll(".bill-delete.delete-confirm")
+                    .forEach(function (otherButton) {
+
+                        otherButton.classList.remove(
+                            "delete-confirm"
+                        );
+
+                        otherButton.textContent = "×";
+
+                    });
+
+
+                button.classList.add("delete-confirm");
+
+                button.textContent = "✓";
+
+                return;
+            }
+
+
+            // Second click actually deletes the bill.
+
+            const billId =
+                bill.dataset.billId;
+
+
+            fetch(`/bill/${billId}/delete/`, {
+
+                method: "POST",
+
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+
+            })
+
+            .then(function (response) {
+
+                return response.json();
+
+            })
+
+            .then(function (data) {
+
+                if (data.success) {
+
+                    updateDashboard(data);
+
+                }
+
+            });
+
+        });
+
+    });
+
+}
 
 // ----------------------------------------
 // Bill amount editing
@@ -147,10 +293,14 @@ function initializeBillAmounts() {
     billAmounts.forEach(function (billAmount) {
 
         const display =
-            billAmount.querySelector(".bill-amount-display");
+            billAmount.querySelector(
+                ".bill-amount-display"
+            );
 
         const input =
-            billAmount.querySelector(".bill-amount-input");
+            billAmount.querySelector(
+                ".bill-amount-input"
+            );
 
 
         if (!display || !input) {
@@ -162,9 +312,16 @@ function initializeBillAmounts() {
 
             event.stopPropagation();
 
+
+            // Select the bill when editing.
+
+            selectBill(billAmount);
+
+
             billAmount.classList.add("editing");
 
             input.focus();
+
             input.select();
 
         });
@@ -236,7 +393,9 @@ function initializeBillAmounts() {
 
             })
             .then(function (response) {
+
                 return response.json();
+
             })
             .then(function (data) {
 
@@ -270,10 +429,14 @@ function initializeBillDates() {
     billDates.forEach(function (billDate) {
 
         const display =
-            billDate.querySelector(".bill-date-display");
+            billDate.querySelector(
+                ".bill-date-display"
+            );
 
         const input =
-            billDate.querySelector(".bill-date-input");
+            billDate.querySelector(
+                ".bill-date-input"
+            );
 
 
         if (!display || !input) {
@@ -285,9 +448,16 @@ function initializeBillDates() {
 
             event.stopPropagation();
 
+
+            // Select the bill when editing.
+
+            selectBill(billDate);
+
+
             billDate.classList.add("editing");
 
             input.focus();
+
 
             if (input.showPicker) {
                 input.showPicker();
@@ -341,7 +511,9 @@ function initializeBillDates() {
 
             })
             .then(function (response) {
+
                 return response.json();
+
             })
             .then(function (data) {
 
@@ -394,6 +566,12 @@ function initializeBillFrequencies() {
 
             event.stopPropagation();
 
+
+            // Select the bill when editing.
+
+            selectBill(billFrequency);
+
+
             billFrequency.classList.add("editing");
 
             input.focus();
@@ -419,6 +597,7 @@ function initializeBillFrequencies() {
 
             const frequency = input.value;
 
+
             const billId =
                 billFrequency.dataset.billId;
 
@@ -440,7 +619,9 @@ function initializeBillFrequencies() {
 
             })
             .then(function (response) {
+
                 return response.json();
+
             })
             .then(function (data) {
 
@@ -474,10 +655,14 @@ function initializeBillNames() {
     billNames.forEach(function (billName) {
 
         const display =
-            billName.querySelector(".bill-name-display");
+            billName.querySelector(
+                ".bill-name-display"
+            );
 
         const input =
-            billName.querySelector(".bill-name-input");
+            billName.querySelector(
+                ".bill-name-input"
+            );
 
 
         if (!display || !input) {
@@ -489,9 +674,16 @@ function initializeBillNames() {
 
             event.stopPropagation();
 
+
+            // Select the bill when editing.
+
+            selectBill(billName);
+
+
             billName.classList.add("editing");
 
             input.focus();
+
             input.select();
 
             resizeNameInput();
@@ -540,6 +732,7 @@ function initializeBillNames() {
             const textLength =
                 Math.max(input.value.length, 1);
 
+
             input.style.width =
                 `${textLength}ch`;
 
@@ -548,12 +741,14 @@ function initializeBillNames() {
 
         function saveBillName() {
 
-            const name = input.value.trim();
+            const name =
+                input.value.trim();
 
 
             if (!name) {
 
-                input.value = input.defaultValue;
+                input.value =
+                    input.defaultValue;
 
                 billName.classList.remove("editing");
 
@@ -583,7 +778,9 @@ function initializeBillNames() {
 
             })
             .then(function (response) {
+
                 return response.json();
+
             })
             .then(function (data) {
 
@@ -607,6 +804,35 @@ function initializeBillNames() {
 
 
 // ----------------------------------------
+// Select a bill
+// ----------------------------------------
+
+function selectBill(element) {
+
+    const bill =
+        element.closest(".bill");
+
+
+    if (!bill) {
+        return;
+    }
+
+
+    document
+        .querySelectorAll(".bill.selected")
+        .forEach(function (selectedBill) {
+
+            selectedBill.classList.remove("selected");
+
+        });
+
+
+    bill.classList.add("selected");
+
+}
+
+
+// ----------------------------------------
 // Update dashboard
 // ----------------------------------------
 
@@ -617,7 +843,7 @@ function updateDashboard(data) {
     }
 
 
-    // Update remaining amount
+    // Update remaining amount.
 
     const remainingAmount =
         document.querySelector(".hero-amount");
@@ -631,7 +857,7 @@ function updateDashboard(data) {
     }
 
 
-    // Update total bills
+    // Update total bills.
 
     const totalBills =
         document.querySelector(".bills-total");
@@ -645,20 +871,16 @@ function updateDashboard(data) {
     }
 
 
-    // Replace bill list
+    // Replace bill list.
 
     const billsList =
         document.querySelector(".bills-list");
 
 
-    if (billsList && data.bills_html) {
+    if (billsList) {
 
         billsList.innerHTML =
-            data.bills_html;
-
-
-        // The old elements were destroyed,
-        // so attach their editing behavior again.
+            data.bills_html || "";
 
         initializeBillEditing();
 
@@ -699,7 +921,7 @@ function getCookie(name) {
 
 
 // ----------------------------------------
-// Initial bill editing setup
+// Initial bill setup
 // ----------------------------------------
 
 initializeBillEditing();
@@ -758,6 +980,27 @@ document.addEventListener("keydown", function (event) {
         if (updatePayModal) {
             updatePayModal.classList.remove("show");
         }
+
+    }
+
+});
+
+
+// ----------------------------------------
+// Deselect bill when clicking outside
+// ----------------------------------------
+
+document.addEventListener("click", function (event) {
+
+    if (!event.target.closest(".bill")) {
+
+        document
+            .querySelectorAll(".bill.selected")
+            .forEach(function (bill) {
+
+                bill.classList.remove("selected");
+
+            });
 
     }
 

@@ -161,10 +161,18 @@ def home(request):
 def delete_bill(request, bill_id):
 
     if request.method == "POST":
+
         bill = Bill.objects.get(id=bill_id)
         bill.delete()
 
-    return redirect("home")
+        return JsonResponse({
+            "success": True,
+            **dashboard_json(),
+        })
+
+    return JsonResponse({
+        "success": False,
+    }, status=405)
 
 def update_bill_amount(request, bill_id):
 
