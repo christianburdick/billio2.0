@@ -68,20 +68,21 @@ body {
 
 .hero-label {
     color: #a1a1a6;
-    font-size: 15px;
-    margin-bottom: 8px;
+    font-size: 14px;
+    margin-bottom: 6px;
 }
 
 .hero-amount {
     font-size: 56px;
     font-weight: 700;
     letter-spacing: -2px;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
 }
 
 .pay-period {
     color: #a1a1a6;
-    font-size: 15px;
+    font-size: 14px;
+    margin-top: 4px;
 }
 
 .cards {
@@ -408,4 +409,124 @@ button:hover {
 
 .floating-action.open {
     transform: rotate(45deg);
+}
+
+.bill-amount-input {
+    display: none;
+
+    width: 90px;
+
+    border: none;
+    border-bottom: 1px solid #1d1d1f;
+
+    padding: 4px 0;
+
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+
+    text-align: right;
+
+    outline: none;
+    background: transparent;
+}
+
+.bill-amount.editing .bill-amount-display {
+    display: none;
+}
+
+.bill-amount.editing .bill-amount-input {
+    display: block;
+}
+
+.bill-date-input {
+    display: none;
+
+    border: none;
+    border-bottom: 1px solid #1d1d1f;
+
+    padding: 2px 0;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    color: #1d1d1f;
+    background: transparent;
+
+    outline: none;
+}
+
+.bill-date.editing .bill-date-display {
+    display: none;
+}
+
+.bill-date.editing .bill-date-input {
+    display: block;
+}
+
+.bill-frequency {
+    margin-top: 4px;
+}
+
+.bill-frequency-display {
+    color: #86868b;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.bill-frequency-input {
+    display: none;
+
+    border: none;
+    border-bottom: 1px solid #1d1d1f;
+
+    padding: 2px 0;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    color: #1d1d1f;
+    background: transparent;
+
+    outline: none;
+}
+
+.bill-frequency.editing .bill-frequency-display {
+    display: none;
+}
+
+.bill-frequency.editing .bill-frequency-input {
+    display: block;
+}
+
+.bill-name-input {
+    display: none;
+
+    width: 100%;
+
+    border: none;
+    border-bottom: 1px solid #1d1d1f;
+
+    padding: 2px 0;
+
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
+
+    color: #1d1d1f;
+    background: transparent;
+
+    outline: none;
+}
+
+.bill-name.editing .bill-name-display {
+    display: none;
+}
+
+.bill-name.editing .bill-name-input {
+    display: block;
+}
+
+.bill-name-display {
+    cursor: pointer;
 }
