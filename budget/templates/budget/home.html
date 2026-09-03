@@ -33,7 +33,7 @@
             </div>
 
             <div class="hero-amount">
-                ${{ remaining }}
+                ${{ remaining|floatformat:2 }}
             </div>
 
             <div class="pay-period">
@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="card-value">
-                    ${{ income.amount }}
+                    ${{ income.amount|floatformat:2 }}
                 </div>
 
             </div>
@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="card-value">
-                    -${{ total_bills }}
+                    -${{ total_bills|floatformat:2 }}
                 </div>
 
             </div>
@@ -104,7 +104,7 @@
                     <div class="bill-actions">
 
                         <div class="bill-amount">
-                            ${{ bill.amount }}
+                            ${{ bill.amount|floatformat:2 }}
                         </div>
 
 

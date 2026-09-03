@@ -50,7 +50,7 @@ body {
     font-size: 56px;
     font-weight: 700;
     letter-spacing: -2px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .pay-period {
@@ -86,7 +86,7 @@ body {
 .bills-section {
     background: white;
     border-radius: 24px;
-    padding: 24px;
+    padding: 28px;
 }
 
 .section-title {
@@ -125,7 +125,9 @@ body {
 }
 
 .bill-amount {
+    font-size: 17px;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .empty {
@@ -178,7 +180,7 @@ button:hover {
 .form-section {
     background: white;
     border-radius: 24px;
-    padding: 24px;
+    padding: 28px;
     margin-top: 20px;
 }
 
