@@ -4,11 +4,22 @@
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-                 "SF Pro Text", sans-serif;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        sans-serif;
+
     background: #f5f5f7;
     color: #1d1d1f;
 }
+
+
+/* ----------------------------------------
+   Container
+---------------------------------------- */
 
 .container {
     width: min(100% - 32px, 900px);
@@ -16,12 +27,18 @@ body {
     padding: 48px 0;
 }
 
+
+/* ----------------------------------------
+   Header
+---------------------------------------- */
+
 .header {
     margin-bottom: 28px;
 }
 
 .header h1 {
     margin: 0;
+
     font-size: 32px;
     font-weight: 600;
     letter-spacing: -1px;
@@ -31,454 +48,184 @@ body {
     display: none;
 }
 
-@media (max-width: 600px) {
-    .container {
-        padding: 24px 16px;
-    }
 
-    .header h1 {
-        font-size: 30px;
-    }
-
-    .hero {
-        padding: 24px;
-        border-radius: 22px;
-    }
-
-    .hero-amount {
-        font-size: 44px;
-    }
-
-    .cards {
-        grid-template-columns: 1fr;
-    }
-
-    .bills-section {
-        border-radius: 22px;
-    }
-}
+/* ----------------------------------------
+   Hero
+---------------------------------------- */
 
 .hero {
     background: #1d1d1f;
     color: white;
+
     border-radius: 28px;
+
     padding: 32px;
     margin-bottom: 20px;
 }
 
 .hero-label {
     color: #a1a1a6;
+
     font-size: 14px;
+
     margin-bottom: 6px;
 }
 
 .hero-amount {
     font-size: 56px;
     font-weight: 700;
+
     letter-spacing: -2px;
+
     margin-bottom: 4px;
 }
 
 .pay-period {
     color: #a1a1a6;
+
     font-size: 14px;
+
     margin-top: 4px;
 }
+
+
+/* ----------------------------------------
+   Summary Cards
+---------------------------------------- */
 
 .cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+
     gap: 20px;
+
     margin-bottom: 32px;
 }
 
 .card {
     background: white;
+
     border-radius: 24px;
+
     padding: 24px;
 }
 
 .card-label {
     color: #86868b;
+
     font-size: 14px;
+
     margin-bottom: 8px;
 }
 
 .card-value {
     font-size: 30px;
     font-weight: 600;
+
     letter-spacing: -1px;
 }
 
+
+/* ----------------------------------------
+   Paycheck Card
+---------------------------------------- */
+
+.paycheck-card {
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease;
+}
+
+.paycheck-card:hover {
+    transform: translateY(-2px);
+}
+
+
+/* ----------------------------------------
+   Bills Section
+---------------------------------------- */
+
 .bills-section {
     background: white;
+
     border-radius: 24px;
+
     padding: 28px;
 }
 
 .section-title {
     font-size: 22px;
     font-weight: 600;
+
     margin-bottom: 20px;
 }
 
 .section-description {
     color: #86868b;
+
     font-size: 15px;
+
     margin-top: -12px;
     margin-bottom: 20px;
 }
 
+
+/* ----------------------------------------
+   Bill Row
+---------------------------------------- */
+
 .bill {
+    padding: 18px 0;
+
     border-bottom: 1px solid #f0f0f0;
-    cursor: pointer;
 }
 
 .bill:last-child {
     border-bottom: none;
 }
 
+
+/* ----------------------------------------
+   Bill Primary Row
+---------------------------------------- */
+
 .bill-main {
     display: flex;
-    justify-content: space-between;
+
     align-items: center;
-    padding: 18px 0;
+    justify-content: space-between;
+
+    gap: 24px;
 }
 
-.bill-info {
-    flex: 1;
-}
+
+/* ----------------------------------------
+   Bill Name
+---------------------------------------- */
 
 .bill-name {
-    font-weight: 500;
+    flex: 1;
+    min-width: 0;
 }
 
-.bill-date {
-    color: #86868b;
-    font-size: 14px;
-    margin-top: 4px;
-}
+.bill-name-display {
+    display: block;
 
-.bill-amount {
     font-size: 17px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.bill-detail {
-    display: none;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 0 18px;
-}
-
-.bill.selected .bill-detail {
-    display: flex;
-}
-
-.bill-detail-label {
-    color: #86868b;
-    font-size: 13px;
-}
-
-.bill-detail-value {
-    margin-top: 3px;
-    font-size: 15px;
-}
-
-.bill-detail-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.empty {
-    color: #86868b;
-}
-
-button {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 18px;
-    background: #1d1d1f;
-    color: white;
-    font-size: 15px;
     font-weight: 500;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
     cursor: pointer;
 }
 
-button:hover {
-    opacity: 0.85;
-}
 
-@media (max-width: 600px) {
-
-    .container {
-        padding: 32px 0;
-    }
-
-    .header h1 {
-        font-size: 36px;
-    }
-
-    .hero {
-        padding: 24px;
-        border-radius: 22px;
-    }
-
-    .hero-amount {
-        font-size: 44px;
-    }
-
-    .cards {
-        grid-template-columns: 1fr;
-    }
-
-    .bills-section {
-        border-radius: 22px;
-    }
-}
-
-.form-section {
-    background: white;
-    border-radius: 24px;
-    padding: 28px;
-    margin-top: 20px;
-}
-
-.bill-form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.form-field {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.form-field label {
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.form-field input,
-.form-field select {
-    width: 100%;
-    border: 1px solid #d2d2d7;
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-family: inherit;
-    font-size: 16px;
-    background: white;
-    color: #1d1d1f;
-    outline: none;
-}
-
-.form-field input:focus,
-.form-field select:focus {
-    border-color: #1d1d1f;
-}
-
-.bill-form button {
-    width: 100%;
-    margin-top: 4px;
-}
-
-.delete-button {
-    background: transparent;
-    color: #86868b;
-    padding: 6px 8px;
-    font-size: 14px;
-}
-
-.delete-button:hover {
-    color: #1d1d1f;
-    opacity: 1;
-}
-
-.back-link {
-    display: inline-block;
-    margin-top: 20px;
-    color: #86868b;
-    text-decoration: none;
-    font-size: 15px;
-}
-
-.back-link:hover {
-    color: #1d1d1f;
-}
-
-.floating-action {
-    position: fixed;
-    right: 32px;
-    bottom: 32px;
-
-    width: 56px;
-    height: 56px;
-
-    padding: 0;
-
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 28px;
-    font-weight: 400;
-
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-@media (max-width: 600px) {
-    .floating-action {
-        right: 20px;
-        bottom: 20px;
-        width: 52px;
-        height: 52px;
-    }
-}
-
-.action-menu {
-    position: fixed;
-    right: 32px;
-    bottom: 100px;
-
-    display: none;
-    flex-direction: column;
-    gap: 8px;
-
-    background: white;
-    padding: 8px;
-
-    border-radius: 16px;
-
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-}
-
-.action-menu button {
-    background: transparent;
-    color: #1d1d1f;
-
-    padding: 12px 16px;
-
-    text-align: left;
-    white-space: nowrap;
-}
-
-.action-menu button:hover {
-    background: #f5f5f7;
-    opacity: 1;
-}
-
-.action-menu.show {
-    display: flex;
-}
-
-@media (max-width: 600px) {
-    .action-menu {
-        right: 20px;
-        bottom: 84px;
-    }
-}
-
-.floating-action {
-    transition: transform 0.2s ease;
-}
-
-.floating-action.open {
-    transform: rotate(45deg);
-}
-
-.bill-amount-input {
-    display: none;
-
-    width: 90px;
-
-    border: none;
-    border-bottom: 1px solid #1d1d1f;
-
-    padding: 4px 0;
-
-    font-family: inherit;
-    font-size: 17px;
-    font-weight: 600;
-
-    text-align: right;
-
-    outline: none;
-    background: transparent;
-}
-
-.bill-amount.editing .bill-amount-display {
-    display: none;
-}
-
-.bill-amount.editing .bill-amount-input {
-    display: block;
-}
-
-.bill-date-input {
-    display: none;
-
-    border: none;
-    border-bottom: 1px solid #1d1d1f;
-
-    padding: 2px 0;
-
-    font-family: inherit;
-    font-size: 14px;
-
-    color: #1d1d1f;
-    background: transparent;
-
-    outline: none;
-}
-
-.bill-date.editing .bill-date-display {
-    display: none;
-}
-
-.bill-date.editing .bill-date-input {
-    display: block;
-}
-
-.bill-frequency {
-    margin-top: 4px;
-}
-
-.bill-frequency-display {
-    color: #86868b;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.bill-frequency-input {
-    display: none;
-
-    border: none;
-    border-bottom: 1px solid #1d1d1f;
-
-    padding: 2px 0;
-
-    font-family: inherit;
-    font-size: 14px;
-
-    color: #1d1d1f;
-    background: transparent;
-
-    outline: none;
-}
-
-.bill-frequency.editing .bill-frequency-display {
-    display: none;
-}
-
-.bill-frequency.editing .bill-frequency-input {
-    display: block;
-}
+/* ----------------------------------------
+   Inline Editing — Name
+---------------------------------------- */
 
 .bill-name-input {
     display: none;
@@ -491,10 +238,11 @@ button:hover {
     padding: 2px 0;
 
     font-family: inherit;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 500;
 
     color: #1d1d1f;
+
     background: transparent;
 
     outline: none;
@@ -508,9 +256,465 @@ button:hover {
     display: block;
 }
 
-.bill-name-display {
+
+/* ----------------------------------------
+   Bill Amount
+---------------------------------------- */
+
+.bill-amount {
+    flex-shrink: 0;
+
+    text-align: right;
+}
+
+.bill-amount-display {
+    font-size: 17px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
     cursor: pointer;
 }
+
+
+/* ----------------------------------------
+   Inline Editing — Name
+---------------------------------------- */
+
+.bill-name-input {
+    display: none;
+
+    width: auto;
+
+    min-width: 1ch;
+    max-width: 100%;
+
+    border: none;
+    border-bottom: 1px solid #d2d2d7;
+
+    padding: 0;
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: normal;
+
+    color: #1d1d1f;
+
+    background: transparent;
+
+    outline: none;
+}
+
+.bill-name.editing .bill-name-display {
+    display: none;
+}
+
+.bill-name.editing .bill-name-input {
+    display: inline-block;
+}
+
+
+/* ----------------------------------------
+   Inline Editing — Amount
+---------------------------------------- */
+
+.bill-amount-input {
+    display: none;
+
+    width: 90px;
+
+    border: none;
+    border-bottom: 1px solid #d2d2d7;
+
+    padding: 0;
+
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+
+    color: #1d1d1f;
+
+    text-align: right;
+
+    background: transparent;
+
+    outline: none;
+
+    line-height: normal;
+}
+
+.bill-amount.editing .bill-amount-display {
+    display: none;
+}
+
+.bill-amount.editing .bill-amount-input {
+    display: block;
+}
+
+
+/* ----------------------------------------
+   Active Inline Input
+---------------------------------------- */
+
+.bill-name-input:focus,
+.bill-amount-input:focus {
+    border-bottom-color: #a1a1a6;
+}
+
+
+/* ----------------------------------------
+   Bill Secondary Details
+---------------------------------------- */
+
+.bill-details {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 5px;
+
+    color: #86868b;
+
+    font-size: 14px;
+}
+
+.bill-details > * + *::before {
+    content: "·";
+
+    margin-right: 8px;
+
+    color: #c7c7cc;
+}
+
+
+/* ----------------------------------------
+   Bill Date
+---------------------------------------- */
+
+.bill-date {
+    display: inline-flex;
+
+    align-items: center;
+
+    position: relative;
+}
+
+.bill-date-display {
+    cursor: pointer;
+}
+
+.bill-date-input {
+    display: none;
+
+    border: none;
+    border-bottom: 1px solid #1d1d1f;
+
+    padding: 0;
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    color: #1d1d1f;
+
+    background: transparent;
+
+    outline: none;
+}
+
+.bill-date.editing .bill-date-display {
+    display: none;
+}
+
+.bill-date.editing .bill-date-input {
+    display: inline-block;
+}
+
+/* ----------------------------------------
+   Bill Frequency
+---------------------------------------- */
+
+.bill-frequency {
+    display: inline-flex;
+
+    align-items: center;
+}
+
+.bill-frequency-display {
+    cursor: pointer;
+}
+
+.bill-frequency-input {
+    display: none;
+
+    border: none;
+    border-bottom: 1px solid #1d1d1f;
+
+    padding: 2px 0;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    color: #1d1d1f;
+
+    background: transparent;
+
+    outline: none;
+}
+
+.bill-frequency.editing .bill-frequency-display {
+    display: none;
+}
+
+.bill-frequency.editing .bill-frequency-input {
+    display: block;
+}
+
+
+/* ----------------------------------------
+   Empty State
+---------------------------------------- */
+
+.empty {
+    color: #86868b;
+}
+
+
+/* ----------------------------------------
+   Buttons
+---------------------------------------- */
+
+button {
+    border: none;
+    border-radius: 12px;
+
+    padding: 12px 18px;
+
+    background: #1d1d1f;
+    color: white;
+
+    font-family: inherit;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+
+/* ----------------------------------------
+   Forms
+---------------------------------------- */
+
+.form-section {
+    background: white;
+
+    border-radius: 24px;
+
+    padding: 28px;
+
+    margin-top: 20px;
+}
+
+.bill-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+.form-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.form-field label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-field input,
+.form-field select {
+    width: 100%;
+
+    border: 1px solid #d2d2d7;
+
+    border-radius: 12px;
+
+    padding: 12px 14px;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    background: white;
+    color: #1d1d1f;
+
+    outline: none;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+    border-color: #1d1d1f;
+}
+
+.bill-form button {
+    width: 100%;
+
+    margin-top: 4px;
+}
+
+
+/* ----------------------------------------
+   Delete Button
+---------------------------------------- */
+
+.delete-button {
+    background: transparent;
+
+    color: #86868b;
+
+    padding: 6px 8px;
+
+    font-size: 14px;
+}
+
+.delete-button:hover {
+    color: #1d1d1f;
+
+    opacity: 1;
+}
+
+
+/* ----------------------------------------
+   Back Link
+---------------------------------------- */
+
+.back-link {
+    display: inline-block;
+
+    margin-top: 20px;
+
+    color: #86868b;
+
+    text-decoration: none;
+
+    font-size: 15px;
+}
+
+.back-link:hover {
+    color: #1d1d1f;
+}
+
+
+/* ----------------------------------------
+   Floating Action Button
+---------------------------------------- */
+
+.floating-action {
+    position: fixed;
+
+    right: 32px;
+    bottom: 32px;
+
+    width: 56px;
+    height: 56px;
+
+    padding: 0;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 28px;
+    font-weight: 400;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.15);
+
+    transition:
+        transform 0.2s ease;
+}
+
+.floating-action.open {
+    transform: rotate(45deg);
+}
+
+
+/* ----------------------------------------
+   Action Menu
+---------------------------------------- */
+
+.action-menu {
+    position: fixed;
+
+    right: 32px;
+    bottom: 100px;
+
+    display: none;
+
+    flex-direction: column;
+
+    min-width: 180px;
+
+    background: white;
+
+    padding: 6px;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.14);
+
+    overflow: hidden;
+
+    z-index: 50;
+}
+
+.action-menu button {
+    width: 100%;
+
+    background: transparent;
+    color: #1d1d1f;
+
+    padding: 14px 16px;
+
+    border-radius: 12px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.action-menu button:hover {
+    background: #f5f5f7;
+
+    opacity: 1;
+}
+
+.action-menu.show {
+    display: flex;
+}
+
 
 /* ----------------------------------------
    Modal
@@ -518,9 +722,11 @@ button:hover {
 
 .modal {
     position: fixed;
+
     inset: 0;
 
     display: none;
+
     align-items: center;
     justify-content: center;
 
@@ -537,19 +743,117 @@ button:hover {
 
 .modal .form-section {
     width: min(100%, 480px);
+
     margin: 0;
 
     max-height: 90vh;
+
     overflow-y: auto;
 
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
-.paycheck-card {
-    cursor: pointer;
-    transition: transform 0.15s ease;
-}
 
-.paycheck-card:hover {
-    transform: translateY(-2px);
+/* ----------------------------------------
+   Mobile
+---------------------------------------- */
+
+@media (max-width: 600px) {
+
+    .container {
+        width: min(100% - 32px, 900px);
+
+        padding: 24px 0;
+    }
+
+
+    .header {
+        margin-bottom: 24px;
+    }
+
+    .header h1 {
+        font-size: 30px;
+    }
+
+
+    .hero {
+        padding: 24px;
+
+        border-radius: 22px;
+    }
+
+    .hero-amount {
+        font-size: 44px;
+    }
+
+
+    .cards {
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+
+        margin-bottom: 24px;
+    }
+
+
+    .card {
+        border-radius: 20px;
+
+        padding: 20px;
+    }
+
+
+    .bills-section {
+        border-radius: 22px;
+
+        padding: 22px;
+    }
+
+
+    .bill-main {
+        gap: 16px;
+    }
+
+
+    .bill-name-display {
+        font-size: 16px;
+    }
+
+
+    .bill-amount-display {
+        font-size: 16px;
+    }
+
+
+    .floating-action {
+        right: 20px;
+        bottom: 20px;
+
+        width: 52px;
+        height: 52px;
+    }
+
+
+    .action-menu {
+        right: 20px;
+        bottom: 84px;
+
+        min-width: 170px;
+    }
+
+
+    .modal {
+        align-items: flex-end;
+
+        padding: 0;
+    }
+
+    .modal .form-section {
+        width: 100%;
+
+        max-height: 90vh;
+
+        border-radius: 24px 24px 0 0;
+    }
 }

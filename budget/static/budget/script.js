@@ -1,8 +1,12 @@
 const addButton = document.getElementById("add-button");
 const actionMenu = document.getElementById("action-menu");
 
-const addBillButton = document.getElementById("add-bill-button");
-const addBillForm = document.getElementById("add-bill-form");
+const addBillButton =
+    document.getElementById("add-bill-button");
+
+const addBillForm =
+    document.getElementById("add-bill-form");
+
 const addBillModal =
     document.getElementById("add-bill-modal");
 
@@ -18,16 +22,34 @@ const updatePayForm =
 const updatePayModal =
     document.getElementById("update-pay-modal");
 
+
 // ----------------------------------------
 // Floating action menu
 // ----------------------------------------
 
 if (addButton && actionMenu) {
 
-    addButton.addEventListener("click", function () {
+    addButton.addEventListener("click", function (event) {
+
+        event.stopPropagation();
 
         actionMenu.classList.toggle("show");
         addButton.classList.toggle("open");
+
+    });
+
+
+    actionMenu.addEventListener("click", function (event) {
+
+        event.stopPropagation();
+
+    });
+
+
+    document.addEventListener("click", function () {
+
+        actionMenu.classList.remove("show");
+        addButton.classList.remove("open");
 
     });
 
@@ -267,7 +289,6 @@ function initializeBillDates() {
 
             input.focus();
 
-
             if (input.showPicker) {
                 input.showPicker();
             }
@@ -473,6 +494,15 @@ function initializeBillNames() {
             input.focus();
             input.select();
 
+            resizeNameInput();
+
+        });
+
+
+        input.addEventListener("input", function () {
+
+            resizeNameInput();
+
         });
 
 
@@ -503,6 +533,17 @@ function initializeBillNames() {
             saveBillName();
 
         });
+
+
+        function resizeNameInput() {
+
+            const textLength =
+                Math.max(input.value.length, 1);
+
+            input.style.width =
+                `${textLength}ch`;
+
+        }
 
 
         function saveBillName() {
@@ -663,6 +704,7 @@ function getCookie(name) {
 
 initializeBillEditing();
 
+
 // ----------------------------------------
 // Close Add Bill modal
 // ----------------------------------------
@@ -681,6 +723,7 @@ if (addBillModal) {
 
 }
 
+
 // ----------------------------------------
 // Close Update Paycheck modal
 // ----------------------------------------
@@ -698,6 +741,7 @@ if (updatePayModal) {
     });
 
 }
+
 
 // ----------------------------------------
 // Escape key closes modal
