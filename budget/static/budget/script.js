@@ -109,6 +109,7 @@ function initializeBillEditing() {
 
 }
 
+
 // ----------------------------------------
 // Bill selection
 // ----------------------------------------
@@ -134,10 +135,6 @@ function initializeBillSelection() {
             }
 
 
-            // If this bill is already selected,
-            // clicking it again hides its details
-            // and resets its delete confirmation.
-
             if (bill.classList.contains("selected")) {
 
                 bill.classList.remove("selected");
@@ -162,11 +159,6 @@ function initializeBillSelection() {
 
             }
 
-
-            // A different bill was clicked.
-            //
-            // Deselect the previous bill AND
-            // reset its delete confirmation.
 
             document
                 .querySelectorAll(".bill.selected")
@@ -196,8 +188,6 @@ function initializeBillSelection() {
                 });
 
 
-            // Select the new bill.
-
             bill.classList.add("selected");
 
         });
@@ -205,6 +195,7 @@ function initializeBillSelection() {
     });
 
 }
+
 
 // ----------------------------------------
 // Bill deletion
@@ -232,8 +223,6 @@ function initializeBillDeletion() {
             }
 
 
-            // First click arms deletion.
-
             if (!button.classList.contains("delete-confirm")) {
 
                 document
@@ -257,8 +246,6 @@ function initializeBillDeletion() {
 
             }
 
-
-            // Second click deletes the bill.
 
             const billId =
                 bill.dataset.billId;
@@ -910,6 +897,7 @@ function updateDashboard(data) {
     // Reattach all bill event listeners.
 
     initializeBillEditing();
+    initializeBillSorting();
 
 
     // ----------------------------------------
@@ -982,10 +970,6 @@ function updateDashboard(data) {
                 }
 
 
-                // Tell the blur handler that this
-                // blur is intentional because we are
-                // moving to the amount field.
-
                 nameInput.dataset.creationCompleted =
                     "true";
 
@@ -1028,8 +1012,6 @@ function updateDashboard(data) {
                         "editing"
                     );
 
-
-                    // Find the bill again.
 
                     const updatedBill =
                         document.querySelector(
@@ -1091,9 +1073,6 @@ function updateDashboard(data) {
             "blur",
             function () {
 
-                // If Enter was used to continue
-                // to the amount field, do nothing.
-
                 if (
                     nameInput.dataset.creationCompleted ===
                     "true"
@@ -1105,9 +1084,6 @@ function updateDashboard(data) {
                 const name =
                     nameInput.value.trim();
 
-
-                // If the user clicked away while
-                // the name is empty, use Untitled.
 
                 if (!name) {
 
@@ -1140,8 +1116,6 @@ function updateDashboard(data) {
 
                     }
 
-
-                    // Save Untitled to Django.
 
                     fetch(`/bill/${billId}/name/`, {
 
@@ -1271,12 +1245,8 @@ function initializeCreationAmountFlow(
                 }
 
 
-                // Re-render the dashboard.
-
                 updateDashboard(saveData);
 
-
-                // Find the newly-rendered bill.
 
                 const updatedBill =
                     document.querySelector(
@@ -1291,8 +1261,6 @@ function initializeCreationAmountFlow(
 
                 updatedBill.classList.add("selected");
 
-
-                // Find the new date elements.
 
                 const dateElement =
                     updatedBill.querySelector(
@@ -1310,20 +1278,14 @@ function initializeCreationAmountFlow(
                 }
 
 
-                // Show the date field.
-
                 dateElement.classList.add("editing");
 
-
-                // Attach the creation flow.
 
                 initializeCreationDateFlow(
                     updatedBill,
                     dateInput
                 );
 
-
-                // Focus the date field.
 
                 dateInput.focus();
 
@@ -1403,12 +1365,8 @@ function initializeCreationDateFlow(
                 }
 
 
-                // Re-render the dashboard.
-
                 updateDashboard(saveData);
 
-
-                // Find the newly-rendered bill.
 
                 const updatedBill =
                     document.querySelector(
@@ -1423,8 +1381,6 @@ function initializeCreationDateFlow(
 
                 updatedBill.classList.add("selected");
 
-
-                // Find the new frequency elements.
 
                 const frequencyElement =
                     updatedBill.querySelector(
@@ -1445,15 +1401,11 @@ function initializeCreationDateFlow(
                 }
 
 
-                // Attach the creation handler.
-
                 initializeCreationFrequencyFlow(
                     updatedBill,
                     frequencyInput
                 );
 
-
-                // Open frequency editing.
 
                 frequencyElement.classList.add(
                     "editing"
@@ -1540,12 +1492,8 @@ function initializeCreationFrequencyFlow(
                 }
 
 
-                // Final dashboard refresh.
-
                 updateDashboard(saveData);
 
-
-                // Creation is complete.
 
                 const finishedBill =
                     document.querySelector(
@@ -1601,10 +1549,175 @@ function getCookie(name) {
 
 
 // ----------------------------------------
+// Bill drag-and-drop ordering
+// ----------------------------------------
+
+function initializeBillSorting() {
+
+    const currentBills =
+        document.getElementById("current-bills");
+
+    const upcomingBills =
+        document.getElementById("upcoming-bills");
+
+
+    if (currentBills) {
+
+        new Sortable(currentBills, {
+
+            animation: 200,
+
+            delay: 200,
+
+            draggable: ".bill",
+
+            forceFallback: true,
+
+            group: {
+                name: "current-bills",
+                pull: false,
+                put: false,
+            },
+
+            onStart: function () {
+
+                console.log(
+                    "Started dragging current bill"
+                );
+
+            },
+
+            onEnd: function () {
+
+                console.log(
+                    "Finished dragging current bill"
+                );
+
+                saveBillOrder(currentBills);
+
+            },
+
+        });
+
+    }
+
+
+    if (upcomingBills) {
+
+        new Sortable(upcomingBills, {
+
+            animation: 200,
+
+            delay: 200,
+
+            draggable: ".bill",
+
+            forceFallback: true,
+
+            group: {
+                name: "upcoming-bills",
+                pull: false,
+                put: false,
+            },
+
+            onStart: function () {
+
+                console.log(
+                    "Started dragging upcoming bill"
+                );
+
+            },
+
+            onEnd: function () {
+
+                console.log(
+                    "Finished dragging upcoming bill"
+                );
+
+                saveBillOrder(upcomingBills);
+
+            },
+
+        });
+
+    }
+
+}
+
+
+// ----------------------------------------
+// Save bill order
+// ----------------------------------------
+
+function saveBillOrder(container) {
+
+    const billIds =
+        Array.from(
+            container.querySelectorAll(".bill")
+        ).map(function (bill) {
+
+            return bill.dataset.billId;
+
+        });
+
+
+    console.log(
+        "Saving bill order:",
+        billIds
+    );
+
+
+    fetch("/bill/reorder/", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type":
+                "application/json",
+
+            "X-CSRFToken":
+                getCookie("csrftoken"),
+
+        },
+
+        body: JSON.stringify({
+
+            bill_ids: billIds,
+
+        }),
+
+    })
+        .then(function (response) {
+
+            return response.json();
+
+        })
+        .then(function (data) {
+
+            console.log(
+                "Reorder response:",
+                data
+            );
+
+        })
+        .catch(function (error) {
+
+            console.error(
+                "Reorder failed:",
+                error
+            );
+
+        });
+
+}
+
+
+// ----------------------------------------
 // Initial bill setup
 // ----------------------------------------
 
 initializeBillEditing();
+initializeBillSorting();
 
 
 // ----------------------------------------

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+
 from budget.views import (
     home,
     add_bill,
@@ -8,6 +9,7 @@ from budget.views import (
     update_bill_frequency,
     update_bill_name,
     update_bill_date,
+    reorder_bills,
 )
 
 urlpatterns = [
@@ -57,6 +59,12 @@ urlpatterns = [
         "bill/add/",
         add_bill,
         name="add_bill",
+    ),
+
+    path(
+        "bill/reorder/",
+        reorder_bills,
+        name="reorder_bills",
     ),
 
 ]

@@ -34,6 +34,7 @@ class Bill(models.Model):
     name = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     due_date = models.DateField()
+    sort_order = models.PositiveIntegerField(default=0)
 
     frequency = models.CharField(
         max_length=20,

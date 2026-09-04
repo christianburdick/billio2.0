@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+import json
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
@@ -11,6 +12,7 @@ from .calculations import (
     get_all_bill_occurrences,
     calculate_remaining,
 )
+
 
 def get_dashboard_data():
 
@@ -51,7 +53,7 @@ def get_dashboard_data():
             (bill, occurrence_date)
             for bill, occurrence_date in bill_occurrences
         ],
-        key=lambda item: item[1]
+        key=lambda item: item[0].sort_order
     )
 
     bills_outside_period = sorted(
@@ -60,7 +62,7 @@ def get_dashboard_data():
             for bill in bills
             if bill.id not in bills_in_period
         ],
-        key=lambda bill: bill.due_date
+        key=lambda bill: bill.sort_order
     )
 
     return {
@@ -74,6 +76,7 @@ def get_dashboard_data():
         "total_bills": total_bills,
         "remaining": remaining,
     }
+
 
 def dashboard_json():
 
@@ -102,6 +105,7 @@ def dashboard_json():
         ),
         "bills_html": bills_html,
     }
+
 
 def home(request):
 
@@ -139,11 +143,22 @@ def home(request):
         in dashboard.get("bill_occurrences", [])
     }
 
+    # Use the existing income as the form instance
+    # so the Update Paycheck form contains
+    # the current paycheck information.
+
+    if dashboard["income"]:
+        income_form = IncomeForm(
+            instance=dashboard["income"]
+        )
+    else:
+        income_form = IncomeForm()
+
     context = {
         "income": dashboard["income"],
         "bills": dashboard["bills"],
         "bills_in_period": bills_in_period,
-        "income_form": IncomeForm(),
+        "income_form": income_form,
         "bill_form": BillForm(),
     }
 
@@ -158,6 +173,7 @@ def home(request):
         "budget/home.html",
         context
     )
+
 
 def delete_bill(request, bill_id):
 
@@ -174,6 +190,7 @@ def delete_bill(request, bill_id):
     return JsonResponse({
         "success": False,
     }, status=405)
+
 
 def update_bill_amount(request, bill_id):
 
@@ -221,6 +238,7 @@ def update_bill_amount(request, bill_id):
         "success": False
     })
 
+
 def update_bill_frequency(request, bill_id):
 
     if request.method == "POST":
@@ -248,6 +266,7 @@ def update_bill_frequency(request, bill_id):
         "success": False
     })
 
+
 def update_bill_name(request, bill_id):
 
     if request.method == "POST":
@@ -268,6 +287,7 @@ def update_bill_name(request, bill_id):
     return JsonResponse({
         "success": False
     })
+
 
 def update_bill_date(request, bill_id):
 
@@ -291,6 +311,7 @@ def update_bill_date(request, bill_id):
         "success": False
     })
 
+
 def add_bill(request):
 
     if request.method == "POST":
@@ -311,3 +332,50 @@ def add_bill(request):
     return JsonResponse({
         "success": False,
     }, status=405)
+
+def reorder_bills(request):
+
+    if request.method != "POST":
+        return JsonResponse({
+            "success": False,
+        }, status=405)
+
+    try:
+        data = json.loads(request.body)
+        bill_ids = data.get("bill_ids", [])
+
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({
+            "success": False,
+            "error": "Invalid request",
+        }, status=400)
+
+    if not isinstance(bill_ids, list):
+        return JsonResponse({
+            "success": False,
+            "error": "Invalid bill order",
+        }, status=400)
+
+    bills = Bill.objects.filter(id__in=bill_ids)
+
+    if bills.count() != len(bill_ids):
+        return JsonResponse({
+            "success": False,
+            "error": "Invalid bill IDs",
+        }, status=400)
+
+    bills_by_id = {
+        str(bill.id): bill
+        for bill in bills
+    }
+
+    for index, bill_id in enumerate(bill_ids):
+
+        bill = bills_by_id[str(bill_id)]
+
+        bill.sort_order = index
+        bill.save(update_fields=["sort_order"])
+
+    return JsonResponse({
+        "success": True,
+    })

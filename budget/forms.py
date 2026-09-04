@@ -4,6 +4,16 @@ from .models import Income, Bill
 
 class IncomeForm(forms.ModelForm):
 
+    amount = forms.DecimalField(
+        min_value=0,
+        widget=forms.NumberInput(
+            attrs={
+                "min": "0",
+                "step": "0.01",
+            }
+        )
+    )
+
     class Meta:
         model = Income
         fields = ["amount", "pay_date", "frequency"]
