@@ -294,7 +294,7 @@ body {
 .bill-amount-area {
     display: flex;
     align-items: flex-start;
-    gap: 4px;
+    gap: 0.5rem;
     flex-shrink: 0;
 }
 
@@ -362,6 +362,7 @@ body {
 
 .bill-amount-input:focus {
     border-bottom-color: #a1a1a6;
+    padding: 0px;
 }
 
 
@@ -394,7 +395,7 @@ body {
 }
 
 .bill .bill-delete:hover {
-    background: #f5f5f7;
+    background: #e5e5e7;
 
     color: #1d1d1f;
 
@@ -413,7 +414,7 @@ body {
 }
 
 .bill .bill-delete.delete-confirm:hover {
-    background: #e5e5e7;
+    background: #fb8282;
 }
 
 
@@ -497,6 +498,11 @@ body {
     display: inline-flex;
 
     align-items: center;
+}
+
+.bill-frequency::before {
+    content: "•";
+    margin-right: 6px;
 }
 
 .bill-frequency-display {
@@ -838,4 +844,10 @@ button:hover {
         border-radius: 24px 24px 0 0;
     }
 
+}
+
+#upcoming-bills {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e5e7;
 }
