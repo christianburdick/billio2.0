@@ -154,7 +154,10 @@
 {% endif %}
 
 
-<div class="bill-group" id="upcoming-bills">
+<div
+    class="bill-group{% if bills_outside_period %} has-upcoming-bills{% endif %}"
+    id="upcoming-bills"
+>
 
     {% for bill in bills_outside_period %}
 
