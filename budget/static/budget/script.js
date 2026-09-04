@@ -7,9 +7,6 @@ const updatePayButton =
 const paycheckCard =
     document.getElementById("paycheck-card");
 
-const updatePayForm =
-    document.getElementById("update-pay-form");
-
 const updatePayModal =
     document.getElementById("update-pay-modal");
 
