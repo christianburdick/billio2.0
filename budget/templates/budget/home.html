@@ -74,11 +74,19 @@
             ${{ income.amount|floatformat:2 }}
         </div>
 
+        <button
+            type="button"
+            class="update-pay-button"
+            id="update-pay-button"
+        >
+            Update
+        </button>
+
     </div>
 
 
     <div
-        class="card"
+        class="card bills-card active"
         id="bills-card"
     >
 
@@ -97,7 +105,10 @@
 
 <!-- Bills This Period -->
 
-<section class="bills-section">
+<section
+    class="bills-section dashboard-view active"
+    id="bills-view"
+>
 
     <div class="section-title">
         Bills
@@ -109,8 +120,25 @@
 
     </div>
 
+    </section>
+
+    <section
+        class="bills-section dashboard-view allocation-view"
+        id="allocation-view"
+    >
+
+        <div class="section-title">
+            Allocation
+        </div>
+
+        <div class="allocation-list-container">
+            {% include "budget/_allocation_list.html" %}
+        </div>
+
 </section>
 
+
+<!-- Update Paycheck -->
 
 <!-- Update Paycheck -->
 

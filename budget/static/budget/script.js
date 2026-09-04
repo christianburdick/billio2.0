@@ -1,5 +1,16 @@
+const allocationUnallocated =
+    document.getElementById(
+        "allocation-unallocated"
+    );
+
 const billsCard =
     document.getElementById("bills-card");
+
+const billsView =
+    document.getElementById("bills-view");
+
+const allocationView =
+    document.getElementById("allocation-view");
 
 const updatePayButton =
     document.getElementById("update-pay-button");
@@ -12,46 +23,6 @@ const updatePayForm =
 
 const updatePayModal =
     document.getElementById("update-pay-modal");
-
-
-// ----------------------------------------
-// Add a new bill inline
-// ----------------------------------------
-
-if (billsCard) {
-
-    billsCard.addEventListener("click", function () {
-
-        fetch("/bill/add/", {
-
-            method: "POST",
-
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken"),
-                "X-Requested-With": "XMLHttpRequest",
-            },
-
-        })
-
-        .then(function (response) {
-
-            return response.json();
-
-        })
-
-        .then(function (data) {
-
-            if (!data.success) {
-                return;
-            }
-
-            updateDashboard(data);
-
-        });
-
-    });
-
-}
 
 
 // ----------------------------------------
@@ -71,17 +42,13 @@ if (updatePayModal) {
 
         updatePayButton.addEventListener(
             "click",
-            openUpdatePaycheck
-        );
+            function (event) {
 
-    }
+                event.stopPropagation();
 
+                openUpdatePaycheck();
 
-    if (paycheckCard) {
-
-        paycheckCard.addEventListener(
-            "click",
-            openUpdatePaycheck
+            }
         );
 
     }
@@ -122,77 +89,82 @@ function initializeBillSelection() {
 
     bills.forEach(function (bill) {
 
-        bill.addEventListener("click", function (event) {
+        bill.addEventListener(
+            "click",
+            function (event) {
 
-            if (
-                event.target.closest(".bill-delete") ||
-                event.target.closest(".bill-name-input") ||
-                event.target.closest(".bill-amount-input") ||
-                event.target.closest(".bill-date-input") ||
-                event.target.closest(".bill-frequency-input")
-            ) {
-                return;
-            }
-
-
-            if (bill.classList.contains("selected")) {
-
-                bill.classList.remove("selected");
-
-
-                const deleteButton =
-                    bill.querySelector(".bill-delete");
-
-
-                if (deleteButton) {
-
-                    deleteButton.classList.remove(
-                        "delete-confirm"
-                    );
-
-                    deleteButton.textContent = "×";
-
+                if (
+                    event.target.closest(".bill-delete") ||
+                    event.target.closest(".bill-name-input") ||
+                    event.target.closest(".bill-amount-input") ||
+                    event.target.closest(".bill-date-input") ||
+                    event.target.closest(".bill-frequency-input")
+                ) {
+                    return;
                 }
 
 
-                return;
+                if (bill.classList.contains("selected")) {
 
-            }
-
-
-            document
-                .querySelectorAll(".bill.selected")
-                .forEach(function (selectedBill) {
-
-                    selectedBill.classList.remove(
+                    bill.classList.remove(
                         "selected"
                     );
 
 
-                    const deleteButton =
-                        selectedBill.querySelector(
-                            ".bill-delete"
+                    resetBillDeleteButton(
+                        bill
+                    );
+
+                    return;
+
+                }
+
+
+                document
+                    .querySelectorAll(".bill.selected")
+                    .forEach(function (selectedBill) {
+
+                        selectedBill.classList.remove(
+                            "selected"
                         );
 
-
-                    if (deleteButton) {
-
-                        deleteButton.classList.remove(
-                            "delete-confirm"
+                        resetBillDeleteButton(
+                            selectedBill
                         );
 
-                        deleteButton.textContent = "×";
-
-                    }
-
-                });
+                    });
 
 
-            bill.classList.add("selected");
+                bill.classList.add("selected");
 
-        });
+            }
+        );
 
     });
+
+}
+
+
+// ----------------------------------------
+// Reset bill delete button
+// ----------------------------------------
+
+function resetBillDeleteButton(bill) {
+
+    const button =
+        bill.querySelector(".bill-delete");
+
+
+    if (!button) {
+        return;
+    }
+
+
+    button.classList.remove(
+        "delete-confirm"
+    );
+
+    button.textContent = "×";
 
 }
 
@@ -209,78 +181,280 @@ function initializeBillDeletion() {
 
     deleteButtons.forEach(function (button) {
 
-        button.addEventListener("click", function (event) {
+        button.addEventListener(
+            "click",
+            function (event) {
 
-            event.stopPropagation();
-
-
-            const bill =
-                button.closest(".bill");
+                event.stopPropagation();
 
 
-            if (!bill) {
-                return;
-            }
+                const bill =
+                    button.closest(".bill");
 
 
-            if (!button.classList.contains("delete-confirm")) {
+                if (!bill) {
+                    return;
+                }
 
-                document
-                    .querySelectorAll(".bill-delete.delete-confirm")
-                    .forEach(function (otherButton) {
 
-                        otherButton.classList.remove(
-                            "delete-confirm"
+                if (
+                    !button.classList.contains(
+                        "delete-confirm"
+                    )
+                ) {
+
+                    document
+                        .querySelectorAll(
+                            ".bill-delete.delete-confirm"
+                        )
+                        .forEach(
+                            function (otherButton) {
+
+                                otherButton.classList.remove(
+                                    "delete-confirm"
+                                );
+
+                                otherButton.textContent =
+                                    "×";
+
+                            }
                         );
 
-                        otherButton.textContent = "×";
 
-                    });
+                    button.classList.add(
+                        "delete-confirm"
+                    );
 
+                    button.textContent = "✓";
 
-                button.classList.add("delete-confirm");
-
-                button.textContent = "✓";
-
-                return;
-
-            }
-
-
-            const billId =
-                bill.dataset.billId;
-
-
-            fetch(`/bill/${billId}/delete/`, {
-
-                method: "POST",
-
-                headers: {
-                    "X-CSRFToken": getCookie("csrftoken"),
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-
-            })
-
-            .then(function (response) {
-
-                return response.json();
-
-            })
-
-            .then(function (data) {
-
-                if (data.success) {
-
-                    updateDashboard(data);
+                    return;
 
                 }
 
-            });
 
-        });
+                const billId =
+                    bill.dataset.billId;
+
+
+                fetch(
+                    `/bill/${billId}/delete/`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "X-CSRFToken":
+                                getCookie(
+                                    "csrftoken"
+                                ),
+
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+                        },
+
+                    }
+                )
+                    .then(function (response) {
+
+                        return response.json();
+
+                    })
+                    .then(function (data) {
+
+                        if (data.success) {
+
+                            updateDashboard(
+                                data
+                            );
+
+                        }
+
+                    });
+
+            }
+        );
 
     });
+
+}
+
+
+// ----------------------------------------
+// Show Bills view
+// ----------------------------------------
+
+function showBillsView() {
+
+    billsView.classList.add("active");
+
+    allocationView.classList.remove(
+        "active"
+    );
+
+    billsCard.classList.add("active");
+
+    paycheckCard.classList.remove(
+        "active"
+    );
+
+
+    localStorage.setItem(
+        "billio-dashboard-view",
+        "bills"
+    );
+
+}
+
+
+// ----------------------------------------
+// Show Allocation view
+// ----------------------------------------
+
+function showAllocationView() {
+
+    billsView.classList.remove("active");
+
+    allocationView.classList.add(
+        "active"
+    );
+
+    billsCard.classList.remove(
+        "active"
+    );
+
+    paycheckCard.classList.add(
+        "active"
+    );
+
+
+    localStorage.setItem(
+        "billio-dashboard-view",
+        "allocation"
+    );
+
+}
+
+
+// ----------------------------------------
+// Bills / Allocation card behavior
+// ----------------------------------------
+
+if (billsCard) {
+
+    billsCard.addEventListener(
+        "click",
+        function () {
+
+            if (
+                allocationView.classList.contains(
+                    "active"
+                )
+            ) {
+
+                showBillsView();
+
+                return;
+
+            }
+
+
+            fetch(
+                "/bill/add/",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "X-CSRFToken":
+                            getCookie(
+                                "csrftoken"
+                            ),
+
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
+
+                }
+            )
+                .then(function (response) {
+
+                    return response.json();
+
+                })
+                .then(function (data) {
+
+                    if (!data.success) {
+                        return;
+                    }
+
+                    updateDashboard(
+                        data
+                    );
+
+                });
+
+        }
+    );
+
+}
+
+
+if (paycheckCard) {
+
+    paycheckCard.addEventListener(
+        "click",
+        function () {
+
+            if (
+                billsView.classList.contains(
+                    "active"
+                )
+            ) {
+
+                showAllocationView();
+
+                return;
+
+            }
+
+
+            fetch(
+                "/allocation/add/",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "X-CSRFToken":
+                            getCookie(
+                                "csrftoken"
+                            ),
+
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
+
+                }
+            )
+                .then(function (response) {
+
+                    return response.json();
+
+                })
+                .then(function (data) {
+
+                    if (!data.success) {
+                        return;
+                    }
+
+                    updateDashboard(
+                        data
+                    );
+
+                });
+
+        }
+    );
 
 }
 
@@ -292,7 +466,9 @@ function initializeBillDeletion() {
 function initializeBillAmounts() {
 
     const billAmounts =
-        document.querySelectorAll(".bill-amount");
+        document.querySelectorAll(
+            ".bill-amount"
+        );
 
 
     billAmounts.forEach(function (billAmount) {
@@ -307,66 +483,107 @@ function initializeBillAmounts() {
                 ".bill-amount-input"
             );
 
+        const bill =
+            billAmount.closest(".bill");
 
-        if (!display || !input) {
+
+        if (
+            !display ||
+            !input ||
+            !bill
+        ) {
             return;
         }
 
 
-        display.addEventListener("click", function (event) {
-
-            event.stopPropagation();
-
-            selectBill(billAmount);
-
-            billAmount.classList.add("editing");
-
-            input.focus();
-
-            input.select();
-
-        });
+        let saving = false;
 
 
-        input.addEventListener("keydown", function (event) {
+        display.addEventListener(
+            "click",
+            function (event) {
 
-            if (event.key === "Enter") {
+                event.stopPropagation();
 
-                event.preventDefault();
+                selectBill(
+                    bill
+                );
+
+                billAmount.classList.add(
+                    "editing"
+                );
+
+                input.focus();
+
+                input.select();
+
+            }
+        );
+
+
+        input.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+
+                    event.preventDefault();
+
+                    saveBillAmount();
+
+                }
+
+
+                if (event.key === "Escape") {
+
+                    event.preventDefault();
+
+                    input.value =
+                        input.defaultValue;
+
+                    billAmount.classList.remove(
+                        "editing"
+                    );
+
+                }
+
+            }
+        );
+
+
+        input.addEventListener(
+            "blur",
+            function () {
+
+                if (saving) {
+                    return;
+                }
 
                 saveBillAmount();
 
             }
-
-
-            if (event.key === "Escape") {
-
-                input.value = input.defaultValue;
-
-                billAmount.classList.remove("editing");
-
-            }
-
-        });
-
-
-        input.addEventListener("blur", function () {
-
-            saveBillAmount();
-
-        });
+        );
 
 
         function saveBillAmount() {
 
-            const amount = input.value;
+            if (saving) {
+                return;
+            }
+
+
+            const amount =
+                input.value.trim();
 
 
             if (!amount) {
 
-                input.value = input.defaultValue;
+                input.value =
+                    input.defaultValue;
 
-                billAmount.classList.remove("editing");
+                billAmount.classList.remove(
+                    "editing"
+                );
 
                 return;
 
@@ -374,43 +591,59 @@ function initializeBillAmounts() {
 
 
             const billId =
-                billAmount.dataset.billId;
+                bill.dataset.billId;
 
 
-            fetch(`/bill/${billId}/amount/`, {
+            saving = true;
 
-                method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded",
+            fetch(
+                `/bill/${billId}/amount/`,
+                {
 
-                    "X-CSRFToken":
-                        getCookie("csrftoken")
-                },
+                    method: "POST",
 
-                body:
-                    `amount=${encodeURIComponent(amount)}`
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded",
 
-            })
+                        "X-CSRFToken":
+                            getCookie(
+                                "csrftoken"
+                            ),
 
-            .then(function (response) {
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
 
-                return response.json();
-
-            })
-
-            .then(function (data) {
-
-                if (data.success) {
-
-                    updateDashboard(data);
+                    body:
+                        `amount=${encodeURIComponent(
+                            amount
+                        )}`
 
                 }
+            )
+                .then(function (response) {
 
-                billAmount.classList.remove("editing");
+                    return response.json();
 
-            });
+                })
+                .then(function (data) {
+
+                    if (data.success) {
+
+                        updateDashboard(
+                            data
+                        );
+
+                    }
+
+                })
+                .finally(function () {
+
+                    saving = false;
+
+                });
 
         }
 
@@ -426,7 +659,9 @@ function initializeBillAmounts() {
 function initializeBillDates() {
 
     const billDates =
-        document.querySelectorAll(".bill-date");
+        document.querySelectorAll(
+            ".bill-date"
+        );
 
 
     billDates.forEach(function (billDate) {
@@ -441,47 +676,80 @@ function initializeBillDates() {
                 ".bill-date-input"
             );
 
+        const bill =
+            billDate.closest(".bill");
 
-        if (!display || !input) {
+
+        if (
+            !display ||
+            !input ||
+            !bill
+        ) {
             return;
         }
 
 
-        display.addEventListener("click", function (event) {
-
-            event.stopPropagation();
-
-            selectBill(billDate);
-
-            billDate.classList.add("editing");
-
-            input.focus();
+        let saving = false;
 
 
-            if (input.showPicker) {
-                input.showPicker();
+        display.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                selectBill(
+                    bill
+                );
+
+                billDate.classList.add(
+                    "editing"
+                );
+
+                input.focus();
+
+
+                if (input.showPicker) {
+
+                    input.showPicker();
+
+                }
+
             }
-
-        });
-
-
-        input.addEventListener("change", function () {
-
-            saveBillDate();
-
-        });
+        );
 
 
-        input.addEventListener("blur", function () {
+        input.addEventListener(
+            "change",
+            function () {
 
-            billDate.classList.remove("editing");
+                saveBillDate();
 
-        });
+            }
+        );
+
+
+        input.addEventListener(
+            "blur",
+            function () {
+
+                billDate.classList.remove(
+                    "editing"
+                );
+
+            }
+        );
 
 
         function saveBillDate() {
 
-            const date = input.value;
+            if (saving) {
+                return;
+            }
+
+
+            const date =
+                input.value;
 
 
             if (!date) {
@@ -490,43 +758,59 @@ function initializeBillDates() {
 
 
             const billId =
-                billDate.dataset.billId;
+                bill.dataset.billId;
 
 
-            fetch(`/bill/${billId}/date/`, {
+            saving = true;
 
-                method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded",
+            fetch(
+                `/bill/${billId}/date/`,
+                {
 
-                    "X-CSRFToken":
-                        getCookie("csrftoken")
-                },
+                    method: "POST",
 
-                body:
-                    `due_date=${encodeURIComponent(date)}`
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded",
 
-            })
+                        "X-CSRFToken":
+                            getCookie(
+                                "csrftoken"
+                            ),
 
-            .then(function (response) {
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
 
-                return response.json();
-
-            })
-
-            .then(function (data) {
-
-                if (data.success) {
-
-                    updateDashboard(data);
+                    body:
+                        `due_date=${encodeURIComponent(
+                            date
+                        )}`
 
                 }
+            )
+                .then(function (response) {
 
-                billDate.classList.remove("editing");
+                    return response.json();
 
-            });
+                })
+                .then(function (data) {
+
+                    if (data.success) {
+
+                        updateDashboard(
+                            data
+                        );
+
+                    }
+
+                })
+                .finally(function () {
+
+                    saving = false;
+
+                });
 
         }
 
@@ -542,101 +826,159 @@ function initializeBillDates() {
 function initializeBillFrequencies() {
 
     const billFrequencies =
-        document.querySelectorAll(".bill-frequency");
+        document.querySelectorAll(
+            ".bill-frequency"
+        );
 
 
-    billFrequencies.forEach(function (billFrequency) {
+    billFrequencies.forEach(
+        function (billFrequency) {
 
-        const display =
-            billFrequency.querySelector(
-                ".bill-frequency-display"
-            );
+            const display =
+                billFrequency.querySelector(
+                    ".bill-frequency-display"
+                );
 
-        const input =
-            billFrequency.querySelector(
-                ".bill-frequency-input"
-            );
+            const input =
+                billFrequency.querySelector(
+                    ".bill-frequency-input"
+                );
 
-
-        if (!display || !input) {
-            return;
-        }
-
-
-        display.addEventListener("click", function (event) {
-
-            event.stopPropagation();
-
-            selectBill(billFrequency);
-
-            billFrequency.classList.add("editing");
-
-            input.focus();
-
-        });
+            const bill =
+                billFrequency.closest(
+                    ".bill"
+                );
 
 
-        input.addEventListener("change", function () {
-
-            saveBillFrequency();
-
-        });
-
-
-        input.addEventListener("blur", function () {
-
-            billFrequency.classList.remove("editing");
-
-        });
+            if (
+                !display ||
+                !input ||
+                !bill
+            ) {
+                return;
+            }
 
 
-        function saveBillFrequency() {
-
-            const frequency = input.value;
+            let saving = false;
 
 
-            const billId =
-                billFrequency.dataset.billId;
+            display.addEventListener(
+                "click",
+                function (event) {
 
+                    event.stopPropagation();
 
-            fetch(`/bill/${billId}/frequency/`, {
+                    selectBill(
+                        bill
+                    );
 
-                method: "POST",
+                    billFrequency.classList.add(
+                        "editing"
+                    );
 
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded",
-
-                    "X-CSRFToken":
-                        getCookie("csrftoken")
-                },
-
-                body:
-                    `frequency=${encodeURIComponent(frequency)}`
-
-            })
-
-            .then(function (response) {
-
-                return response.json();
-
-            })
-
-            .then(function (data) {
-
-                if (data.success) {
-
-                    updateDashboard(data);
+                    input.focus();
 
                 }
+            );
 
-                billFrequency.classList.remove("editing");
 
-            });
+            input.addEventListener(
+                "change",
+                function () {
+
+                    saveBillFrequency();
+
+                }
+            );
+
+
+            input.addEventListener(
+                "blur",
+                function () {
+
+                    billFrequency.classList.remove(
+                        "editing"
+                    );
+
+                }
+            );
+
+
+            function saveBillFrequency() {
+
+                if (saving) {
+                    return;
+                }
+
+
+                const frequency =
+                    input.value;
+
+
+                if (!frequency) {
+                    return;
+                }
+
+
+                const billId =
+                    bill.dataset.billId;
+
+
+                saving = true;
+
+
+                fetch(
+                    `/bill/${billId}/frequency/`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded",
+
+                            "X-CSRFToken":
+                                getCookie(
+                                    "csrftoken"
+                                ),
+
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+                        },
+
+                        body:
+                            `frequency=${encodeURIComponent(
+                                frequency
+                            )}`
+
+                    }
+                )
+                    .then(function (response) {
+
+                        return response.json();
+
+                    })
+                    .then(function (data) {
+
+                        if (data.success) {
+
+                            updateDashboard(
+                                data
+                            );
+
+                        }
+
+                    })
+                    .finally(function () {
+
+                        saving = false;
+
+                    });
+
+            }
 
         }
-
-    });
+    );
 
 }
 
@@ -648,7 +990,9 @@ function initializeBillFrequencies() {
 function initializeBillNames() {
 
     const billNames =
-        document.querySelectorAll(".bill-name");
+        document.querySelectorAll(
+            ".bill-name"
+        );
 
 
     billNames.forEach(function (billName) {
@@ -663,69 +1007,107 @@ function initializeBillNames() {
                 ".bill-name-input"
             );
 
+        const bill =
+            billName.closest(".bill");
 
-        if (!display || !input) {
+
+        if (
+            !display ||
+            !input ||
+            !bill
+        ) {
             return;
         }
 
 
-        display.addEventListener("click", function (event) {
-
-            event.stopPropagation();
-
-            selectBill(billName);
-
-            billName.classList.add("editing");
-
-            input.focus();
-
-            input.select();
-
-            resizeNameInput();
-
-        });
+        let saving = false;
 
 
-        input.addEventListener("input", function () {
+        display.addEventListener(
+            "click",
+            function (event) {
 
-            resizeNameInput();
+                event.stopPropagation();
 
-        });
+                selectBill(
+                    bill
+                );
+
+                billName.classList.add(
+                    "editing"
+                );
+
+                input.focus();
+
+                input.select();
+
+                resizeNameInput();
+
+            }
+        );
 
 
-        input.addEventListener("keydown", function (event) {
+        input.addEventListener(
+            "input",
+            function () {
 
-            if (event.key === "Enter") {
+                resizeNameInput();
 
-                event.preventDefault();
+            }
+        );
+
+
+        input.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+
+                    event.preventDefault();
+
+                    saveBillName();
+
+                }
+
+
+                if (event.key === "Escape") {
+
+                    event.preventDefault();
+
+                    input.value =
+                        input.defaultValue;
+
+                    billName.classList.remove(
+                        "editing"
+                    );
+
+                }
+
+            }
+        );
+
+
+        input.addEventListener(
+            "blur",
+            function () {
+
+                if (saving) {
+                    return;
+                }
 
                 saveBillName();
 
             }
-
-
-            if (event.key === "Escape") {
-
-                input.value = input.defaultValue;
-
-                billName.classList.remove("editing");
-
-            }
-
-        });
-
-
-        input.addEventListener("blur", function () {
-
-            saveBillName();
-
-        });
+        );
 
 
         function resizeNameInput() {
 
             const textLength =
-                Math.max(input.value.length, 1);
+                Math.max(
+                    input.value.length,
+                    1
+                );
 
 
             input.style.width =
@@ -736,6 +1118,11 @@ function initializeBillNames() {
 
         function saveBillName() {
 
+            if (saving) {
+                return;
+            }
+
+
             const name =
                 input.value.trim();
 
@@ -745,7 +1132,9 @@ function initializeBillNames() {
                 input.value =
                     input.defaultValue;
 
-                billName.classList.remove("editing");
+                billName.classList.remove(
+                    "editing"
+                );
 
                 return;
 
@@ -753,45 +1142,65 @@ function initializeBillNames() {
 
 
             const billId =
-                billName.dataset.billId;
+                bill.dataset.billId;
 
 
-            fetch(`/bill/${billId}/name/`, {
+            saving = true;
 
-                method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded",
+            fetch(
+                `/bill/${billId}/name/`,
+                {
 
-                    "X-CSRFToken":
-                        getCookie("csrftoken")
-                },
+                    method: "POST",
 
-                body:
-                    `name=${encodeURIComponent(name)}`
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded",
 
-            })
+                        "X-CSRFToken":
+                            getCookie(
+                                "csrftoken"
+                            ),
 
-            .then(function (response) {
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
 
-                return response.json();
-
-            })
-
-            .then(function (data) {
-
-                if (data.success) {
-
-                    display.textContent = name;
-
-                    input.defaultValue = name;
+                    body:
+                        `name=${encodeURIComponent(
+                            name
+                        )}`
 
                 }
+            )
+                .then(function (response) {
 
-                billName.classList.remove("editing");
+                    return response.json();
 
-            });
+                })
+                .then(function (data) {
+
+                    if (data.success) {
+
+                        display.textContent =
+                            name;
+
+                        input.defaultValue =
+                            name;
+
+                        billName.classList.remove(
+                            "editing"
+                        );
+
+                    }
+
+                })
+                .finally(function () {
+
+                    saving = false;
+
+                });
 
         }
 
@@ -804,11 +1213,7 @@ function initializeBillNames() {
 // Select a bill
 // ----------------------------------------
 
-function selectBill(element) {
-
-    const bill =
-        element.closest(".bill");
-
+function selectBill(bill) {
 
     if (!bill) {
         return;
@@ -819,12 +1224,24 @@ function selectBill(element) {
         .querySelectorAll(".bill.selected")
         .forEach(function (selectedBill) {
 
-            selectedBill.classList.remove("selected");
+            if (selectedBill !== bill) {
+
+                selectedBill.classList.remove(
+                    "selected"
+                );
+
+                resetBillDeleteButton(
+                    selectedBill
+                );
+
+            }
 
         });
 
 
-    bill.classList.add("selected");
+    bill.classList.add(
+        "selected"
+    );
 
 }
 
@@ -835,15 +1252,23 @@ function selectBill(element) {
 
 function updateDashboard(data) {
 
-    if (!data.success) {
+    if (
+        !data ||
+        !data.success
+    ) {
         return;
     }
 
 
-    // Remember the currently selected bill.
+    // ----------------------------------------
+    // Remember selected bill
+    // ----------------------------------------
 
     const selectedBill =
-        document.querySelector(".bill.selected");
+        document.querySelector(
+            ".bill.selected"
+        );
+
 
     const selectedBillId =
         selectedBill
@@ -851,53 +1276,180 @@ function updateDashboard(data) {
             : null;
 
 
-    // Update remaining amount.
+    // ----------------------------------------
+    // Remember selected allocation
+    // ----------------------------------------
+
+    const selectedAllocation =
+        document.querySelector(
+            ".allocation.selected"
+        );
+
+
+    const selectedAllocationId =
+        selectedAllocation
+            ? selectedAllocation.dataset.allocationId
+            : null;
+
+
+    // ----------------------------------------
+    // Update remaining amount
+    // ----------------------------------------
 
     const remainingAmount =
-        document.querySelector(".hero-amount");
+        document.querySelector(
+            ".hero-amount"
+        );
 
 
     if (remainingAmount) {
 
-        remainingAmount.textContent =
-            `$${parseFloat(data.remaining).toFixed(2)}`;
+        const remaining =
+            parseFloat(
+                data.remaining
+            );
+
+
+        if (
+            !Number.isNaN(
+                remaining
+            )
+        ) {
+
+            remainingAmount.textContent =
+                `$${remaining.toFixed(2)}`;
+
+        }
 
     }
 
 
-    // Update total bills.
+    // ----------------------------------------
+    // Update total bills
+    // ----------------------------------------
 
     const totalBills =
-        document.querySelector(".bills-total");
+        document.querySelector(
+            ".bills-total"
+        );
 
 
     if (totalBills) {
 
-        totalBills.textContent =
-            `$${parseFloat(data.total_bills).toFixed(2)}`;
+        const total =
+            parseFloat(
+                data.total_bills
+            );
+
+
+        if (
+            !Number.isNaN(
+                total
+            )
+        ) {
+
+            totalBills.textContent =
+                `$${total.toFixed(2)}`;
+
+        }
 
     }
 
 
-    // Replace bill list.
+    // ----------------------------------------
+    // Replace bill list
+    // ----------------------------------------
 
     const billsList =
-        document.querySelector(".bills-list");
+        document.querySelector(
+            ".bills-list"
+        );
 
 
-    if (!billsList) {
-        return;
+    if (billsList) {
+
+        billsList.innerHTML =
+            data.bills_html || "";
+
+
+        initializeBillEditing();
+
+        initializeBillSorting();
+
     }
 
 
-    billsList.innerHTML =
-        data.bills_html || "";
+    // ----------------------------------------
+    // Replace allocation list
+    // ----------------------------------------
+
+    const allocationList =
+        document.querySelector(
+            ".allocation-list-container"
+        );
 
 
-    // Reattach all bill event listeners.
+    if (
+        allocationList &&
+        typeof data.allocations_html !==
+            "undefined"
+    ) {
 
-    initializeBillEditing();
-    initializeBillSorting();
+        allocationList.innerHTML =
+            data.allocations_html || "";
+
+
+        initializeAllocationEditing();
+
+        initializeAllocationSorting();
+
+    }
+
+
+    // ----------------------------------------
+    // Restore selected bill
+    // ----------------------------------------
+
+    if (selectedBillId) {
+
+        const updatedBill =
+            document.querySelector(
+                `.bill[data-bill-id="${selectedBillId}"]`
+            );
+
+
+        if (updatedBill) {
+
+            updatedBill.classList.add(
+                "selected"
+            );
+
+        }
+
+    }
+
+
+    // ----------------------------------------
+    // Restore selected allocation
+    // ----------------------------------------
+
+    if (selectedAllocationId) {
+
+        const updatedAllocation =
+            document.querySelector(
+                `.allocation[data-allocation-id="${selectedAllocationId}"]`
+            );
+
+
+        if (updatedAllocation) {
+
+            updatedAllocation.classList.add(
+                "selected"
+            );
+
+        }
+
+    }
 
 
     // ----------------------------------------
@@ -917,26 +1469,35 @@ function updateDashboard(data) {
         }
 
 
-        // Select the new bill.
-
-        newBill.classList.add("selected");
+        newBill.classList.add(
+            "selected"
+        );
 
 
         const nameElement =
-            newBill.querySelector(".bill-name");
+            newBill.querySelector(
+                ".bill-name"
+            );
+
 
         const nameInput =
-            newBill.querySelector(".bill-name-input");
+            newBill.querySelector(
+                ".bill-name-input"
+            );
 
 
-        if (!nameElement || !nameInput) {
+        if (
+            !nameElement ||
+            !nameInput
+        ) {
             return;
         }
 
 
-        // Open the name field.
+        nameElement.classList.add(
+            "editing"
+        );
 
-        nameElement.classList.add("editing");
 
         nameInput.focus();
 
@@ -978,88 +1539,102 @@ function updateDashboard(data) {
                     newBill.dataset.billId;
 
 
-                fetch(`/bill/${billId}/name/`, {
+                fetch(
+                    `/bill/${billId}/name/`,
+                    {
 
-                    method: "POST",
+                        method: "POST",
 
-                    headers: {
-                        "Content-Type":
-                            "application/x-www-form-urlencoded",
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded",
 
-                        "X-CSRFToken":
-                            getCookie("csrftoken")
-                    },
+                            "X-CSRFToken":
+                                getCookie(
+                                    "csrftoken"
+                                ),
 
-                    body:
-                        `name=${encodeURIComponent(name)}`
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+                        },
 
-                })
+                        body:
+                            `name=${encodeURIComponent(
+                                name
+                            )}`
 
-                .then(function (response) {
-
-                    return response.json();
-
-                })
-
-                .then(function (saveData) {
-
-                    if (!saveData.success) {
-                        return;
                     }
+                )
+                    .then(function (response) {
+
+                        return response.json();
+
+                    })
+                    .then(function (saveData) {
+
+                        if (
+                            !saveData.success
+                        ) {
+                            return;
+                        }
 
 
-                    nameElement.classList.remove(
-                        "editing"
-                    );
-
-
-                    const updatedBill =
-                        document.querySelector(
-                            `.bill[data-bill-id="${billId}"]`
+                        updateDashboard(
+                            saveData
                         );
 
 
-                    if (!updatedBill) {
-                        return;
-                    }
+                        const updatedBill =
+                            document.querySelector(
+                                `.bill[data-bill-id="${billId}"]`
+                            );
 
 
-                    updatedBill.classList.add("selected");
+                        if (!updatedBill) {
+                            return;
+                        }
 
 
-                    const amountElement =
-                        updatedBill.querySelector(
-                            ".bill-amount"
-                        );
-
-                    const amountInput =
-                        updatedBill.querySelector(
-                            ".bill-amount-input"
+                        updatedBill.classList.add(
+                            "selected"
                         );
 
 
-                    if (
-                        amountElement &&
-                        amountInput
-                    ) {
-
-                        amountElement.classList.add(
-                            "editing"
-                        );
-
-                        amountInput.focus();
-
-                        amountInput.select();
+                        const amountElement =
+                            updatedBill.querySelector(
+                                ".bill-amount"
+                            );
 
 
-                        initializeCreationAmountFlow(
-                            updatedBill,
+                        const amountInput =
+                            updatedBill.querySelector(
+                                ".bill-amount-input"
+                            );
+
+
+                        if (
+                            amountElement &&
                             amountInput
-                        );
+                        ) {
 
-                    }
+                            amountElement.classList.add(
+                                "editing"
+                            );
 
-                });
+
+                            amountInput.focus();
+
+                            amountInput.select();
+
+
+                            initializeCreationAmountFlow(
+                                updatedBill,
+                                amountInput
+                            );
+
+                        }
+
+                    });
 
             }
         );
@@ -1117,50 +1692,37 @@ function updateDashboard(data) {
                     }
 
 
-                    fetch(`/bill/${billId}/name/`, {
+                    fetch(
+                        `/bill/${billId}/name/`,
+                        {
 
-                        method: "POST",
+                            method: "POST",
 
-                        headers: {
-                            "Content-Type":
-                                "application/x-www-form-urlencoded",
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded",
 
-                            "X-CSRFToken":
-                                getCookie("csrftoken")
-                        },
+                                "X-CSRFToken":
+                                    getCookie(
+                                        "csrftoken"
+                                    ),
 
-                        body:
-                            `name=${encodeURIComponent(
-                                "Untitled"
-                            )}`
+                                "X-Requested-With":
+                                    "XMLHttpRequest",
+                            },
 
-                    });
+                            body:
+                                `name=${encodeURIComponent(
+                                    "Untitled"
+                                )}`
+
+                        }
+                    );
 
                 }
 
             }
         );
-
-    }
-
-
-    // ----------------------------------------
-    // Restore previous selected bill
-    // ----------------------------------------
-
-    else if (selectedBillId) {
-
-        const updatedBill =
-            document.querySelector(
-                `.bill[data-bill-id="${selectedBillId}"]`
-            );
-
-
-        if (updatedBill) {
-
-            updatedBill.classList.add("selected");
-
-        }
 
     }
 
@@ -1215,81 +1777,108 @@ function initializeCreationAmountFlow(
                 bill.dataset.billId;
 
 
-            fetch(`/bill/${billId}/amount/`, {
+            fetch(
+                `/bill/${billId}/amount/`,
+                {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded",
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded",
 
-                    "X-CSRFToken":
-                        getCookie("csrftoken")
-                },
+                        "X-CSRFToken":
+                            getCookie(
+                                "csrftoken"
+                            ),
 
-                body:
-                    `amount=${encodeURIComponent(amount)}`
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
 
-            })
+                    body:
+                        `amount=${encodeURIComponent(
+                            amount
+                        )}`
 
-            .then(function (response) {
-
-                return response.json();
-
-            })
-
-            .then(function (saveData) {
-
-                if (!saveData.success) {
-                    return;
                 }
+            )
+                .then(function (response) {
+
+                    return response.json();
+
+                })
+                .then(function (saveData) {
+
+                    if (
+                        !saveData.success
+                    ) {
+                        return;
+                    }
 
 
-                updateDashboard(saveData);
-
-
-                const updatedBill =
-                    document.querySelector(
-                        `.bill[data-bill-id="${billId}"]`
+                    updateDashboard(
+                        saveData
                     );
 
 
-                if (!updatedBill) {
-                    return;
-                }
+                    const updatedBill =
+                        document.querySelector(
+                            `.bill[data-bill-id="${billId}"]`
+                        );
 
 
-                updatedBill.classList.add("selected");
+                    if (!updatedBill) {
+                        return;
+                    }
 
 
-                const dateElement =
-                    updatedBill.querySelector(
-                        ".bill-date"
-                    );
-
-                const dateInput =
-                    updatedBill.querySelector(
-                        ".bill-date-input"
+                    updatedBill.classList.add(
+                        "selected"
                     );
 
 
-                if (!dateElement || !dateInput) {
-                    return;
-                }
+                    const dateElement =
+                        updatedBill.querySelector(
+                            ".bill-date"
+                        );
 
 
-                dateElement.classList.add("editing");
+                    const dateInput =
+                        updatedBill.querySelector(
+                            ".bill-date-input"
+                        );
 
 
-                initializeCreationDateFlow(
-                    updatedBill,
-                    dateInput
-                );
+                    if (
+                        !dateElement ||
+                        !dateInput
+                    ) {
+                        return;
+                    }
 
 
-                dateInput.focus();
+                    dateElement.classList.add(
+                        "editing"
+                    );
 
-            });
+
+                    initializeCreationDateFlow(
+                        updatedBill,
+                        dateInput
+                    );
+
+
+                    dateInput.focus();
+
+
+                    if (dateInput.showPicker) {
+
+                        dateInput.showPicker();
+
+                    }
+
+                });
 
         }
     );
@@ -1335,86 +1924,101 @@ function initializeCreationDateFlow(
                 bill.dataset.billId;
 
 
-            fetch(`/bill/${billId}/date/`, {
+            fetch(
+                `/bill/${billId}/date/`,
+                {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded",
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded",
 
-                    "X-CSRFToken":
-                        getCookie("csrftoken")
-                },
+                        "X-CSRFToken":
+                            getCookie(
+                                "csrftoken"
+                            ),
 
-                body:
-                    `due_date=${encodeURIComponent(date)}`
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
 
-            })
+                    body:
+                        `due_date=${encodeURIComponent(
+                            date
+                        )}`
 
-            .then(function (response) {
-
-                return response.json();
-
-            })
-
-            .then(function (saveData) {
-
-                if (!saveData.success) {
-                    return;
                 }
+            )
+                .then(function (response) {
+
+                    return response.json();
+
+                })
+                .then(function (saveData) {
+
+                    if (
+                        !saveData.success
+                    ) {
+                        return;
+                    }
 
 
-                updateDashboard(saveData);
-
-
-                const updatedBill =
-                    document.querySelector(
-                        `.bill[data-bill-id="${billId}"]`
+                    updateDashboard(
+                        saveData
                     );
 
 
-                if (!updatedBill) {
-                    return;
-                }
+                    const updatedBill =
+                        document.querySelector(
+                            `.bill[data-bill-id="${billId}"]`
+                        );
 
 
-                updatedBill.classList.add("selected");
+                    if (!updatedBill) {
+                        return;
+                    }
 
 
-                const frequencyElement =
-                    updatedBill.querySelector(
-                        ".bill-frequency"
-                    );
-
-                const frequencyInput =
-                    updatedBill.querySelector(
-                        ".bill-frequency-input"
+                    updatedBill.classList.add(
+                        "selected"
                     );
 
 
-                if (
-                    !frequencyElement ||
-                    !frequencyInput
-                ) {
-                    return;
-                }
+                    const frequencyElement =
+                        updatedBill.querySelector(
+                            ".bill-frequency"
+                        );
 
 
-                initializeCreationFrequencyFlow(
-                    updatedBill,
-                    frequencyInput
-                );
+                    const frequencyInput =
+                        updatedBill.querySelector(
+                            ".bill-frequency-input"
+                        );
 
 
-                frequencyElement.classList.add(
-                    "editing"
-                );
+                    if (
+                        !frequencyElement ||
+                        !frequencyInput
+                    ) {
+                        return;
+                    }
 
 
-                frequencyInput.focus();
+                    initializeCreationFrequencyFlow(
+                        updatedBill,
+                        frequencyInput
+                    );
 
-            });
+
+                    frequencyElement.classList.add(
+                        "editing"
+                    );
+
+
+                    frequencyInput.focus();
+
+                });
 
         }
     );
@@ -1460,56 +2064,66 @@ function initializeCreationFrequencyFlow(
                 bill.dataset.billId;
 
 
-            fetch(`/bill/${billId}/frequency/`, {
+            fetch(
+                `/bill/${billId}/frequency/`,
+                {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/x-www-form-urlencoded",
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded",
 
-                    "X-CSRFToken":
-                        getCookie("csrftoken")
-                },
+                        "X-CSRFToken":
+                            getCookie(
+                                "csrftoken"
+                            ),
 
-                body:
-                    `frequency=${encodeURIComponent(
-                        frequency
-                    )}`
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
 
-            })
+                    body:
+                        `frequency=${encodeURIComponent(
+                            frequency
+                        )}`
 
-            .then(function (response) {
-
-                return response.json();
-
-            })
-
-            .then(function (saveData) {
-
-                if (!saveData.success) {
-                    return;
                 }
+            )
+                .then(function (response) {
+
+                    return response.json();
+
+                })
+                .then(function (saveData) {
+
+                    if (
+                        !saveData.success
+                    ) {
+                        return;
+                    }
 
 
-                updateDashboard(saveData);
-
-
-                const finishedBill =
-                    document.querySelector(
-                        `.bill[data-bill-id="${billId}"]`
+                    updateDashboard(
+                        saveData
                     );
 
 
-                if (finishedBill) {
+                    const finishedBill =
+                        document.querySelector(
+                            `.bill[data-bill-id="${billId}"]`
+                        );
 
-                    finishedBill.classList.add(
-                        "selected"
-                    );
 
-                }
+                    if (finishedBill) {
 
-            });
+                        finishedBill.classList.add(
+                            "selected"
+                        );
+
+                    }
+
+                });
 
         }
     );
@@ -1527,15 +2141,23 @@ function getCookie(name) {
         document.cookie.split(";");
 
 
-    for (let cookie of cookies) {
+    for (
+        let cookie of cookies
+    ) {
 
         cookie = cookie.trim();
 
 
-        if (cookie.startsWith(name + "=")) {
+        if (
+            cookie.startsWith(
+                name + "="
+            )
+        ) {
 
             return decodeURIComponent(
-                cookie.substring(name.length + 1)
+                cookie.substring(
+                    name.length + 1
+                )
             );
 
         }
@@ -1555,90 +2177,82 @@ function getCookie(name) {
 function initializeBillSorting() {
 
     const currentBills =
-        document.getElementById("current-bills");
+        document.getElementById(
+            "current-bills"
+        );
 
     const upcomingBills =
-        document.getElementById("upcoming-bills");
+        document.getElementById(
+            "upcoming-bills"
+        );
 
 
     if (currentBills) {
 
-        new Sortable(currentBills, {
+        new Sortable(
+            currentBills,
+            {
 
-            animation: 200,
+                animation: 200,
 
-            delay: 200,
+                delay: 200,
 
-            draggable: ".bill",
+                draggable: ".bill",
 
-            forceFallback: true,
+                forceFallback: true,
 
-            group: {
-                name: "current-bills",
-                pull: false,
-                put: false,
-            },
+                group: {
+                    name: "current-bills",
+                    pull: false,
+                    put: false,
+                },
 
-            onStart: function () {
 
-                console.log(
-                    "Started dragging current bill"
-                );
+                onEnd: function () {
 
-            },
+                    saveBillOrder(
+                        currentBills
+                    );
 
-            onEnd: function () {
+                },
 
-                console.log(
-                    "Finished dragging current bill"
-                );
-
-                saveBillOrder(currentBills);
-
-            },
-
-        });
+            }
+        );
 
     }
 
 
     if (upcomingBills) {
 
-        new Sortable(upcomingBills, {
+        new Sortable(
+            upcomingBills,
+            {
 
-            animation: 200,
+                animation: 200,
 
-            delay: 200,
+                delay: 200,
 
-            draggable: ".bill",
+                draggable: ".bill",
 
-            forceFallback: true,
+                forceFallback: true,
 
-            group: {
-                name: "upcoming-bills",
-                pull: false,
-                put: false,
-            },
+                group: {
+                    name: "upcoming-bills",
+                    pull: false,
+                    put: false,
+                },
 
-            onStart: function () {
 
-                console.log(
-                    "Started dragging upcoming bill"
-                );
+                onEnd: function () {
 
-            },
+                    saveBillOrder(
+                        upcomingBills
+                    );
 
-            onEnd: function () {
+                },
 
-                console.log(
-                    "Finished dragging upcoming bill"
-                );
-
-                saveBillOrder(upcomingBills);
-
-            },
-
-        });
+            }
+        );
 
     }
 
@@ -1653,7 +2267,9 @@ function saveBillOrder(container) {
 
     const billIds =
         Array.from(
-            container.querySelectorAll(".bill")
+            container.querySelectorAll(
+                ".bill"
+            )
         ).map(function (bill) {
 
             return bill.dataset.billId;
@@ -1661,45 +2277,32 @@ function saveBillOrder(container) {
         });
 
 
-    console.log(
-        "Saving bill order:",
-        billIds
-    );
+    fetch(
+        "/bill/reorder/",
+        {
 
+            method: "POST",
 
-    fetch("/bill/reorder/", {
+            headers: {
+                "Content-Type":
+                    "application/json",
 
-        method: "POST",
+                "X-CSRFToken":
+                    getCookie(
+                        "csrftoken"
+                    ),
 
-        headers: {
-            "Content-Type":
-                "application/json",
+            },
 
-            "X-CSRFToken":
-                getCookie("csrftoken"),
+            body: JSON.stringify({
 
-        },
+                bill_ids:
+                    billIds,
 
-        body: JSON.stringify({
+            }),
 
-            bill_ids: billIds,
-
-        }),
-
-    })
-        .then(function (response) {
-
-            return response.json();
-
-        })
-        .then(function (data) {
-
-            console.log(
-                "Reorder response:",
-                data
-            );
-
-        })
+        }
+    )
         .catch(function (error) {
 
             console.error(
@@ -1713,11 +2316,862 @@ function saveBillOrder(container) {
 
 
 // ----------------------------------------
-// Initial bill setup
+// Allocation editing
 // ----------------------------------------
 
+function initializeAllocationEditing() {
+
+    initializeAllocationDeletion();
+
+
+    const allocations =
+        document.querySelectorAll(
+            ".allocation"
+        );
+
+
+    allocations.forEach(
+        function (allocation) {
+
+            const nameDisplay =
+                allocation.querySelector(
+                    ".allocation-name-display"
+                );
+
+            const nameInput =
+                allocation.querySelector(
+                    ".allocation-name-input"
+                );
+
+            const amountDisplay =
+                allocation.querySelector(
+                    ".allocation-amount-display"
+                );
+
+            const amountInput =
+                allocation.querySelector(
+                    ".allocation-amount-input"
+                );
+
+
+            if (
+                !nameDisplay ||
+                !nameInput ||
+                !amountDisplay ||
+                !amountInput
+            ) {
+                return;
+            }
+
+
+            let savingName = false;
+
+            let savingAmount = false;
+
+
+            // ----------------------------------------
+            // Select allocation
+            // ----------------------------------------
+
+            allocation.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.target.closest(
+                            ".allocation-delete"
+                        ) ||
+                        event.target.closest(
+                            ".allocation-name-input"
+                        ) ||
+                        event.target.closest(
+                            ".allocation-amount-input"
+                        )
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        allocation.classList.contains(
+                            "selected"
+                        )
+                    ) {
+
+                        allocation.classList.remove(
+                            "selected"
+                        );
+
+                        allocation.classList.remove(
+                            "editing-name"
+                        );
+
+                        allocation.classList.remove(
+                            "editing-amount"
+                        );
+
+
+                        resetAllocationDeleteButton(
+                            allocation
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    document
+                        .querySelectorAll(
+                            ".allocation.selected"
+                        )
+                        .forEach(
+                            function (
+                                otherAllocation
+                            ) {
+
+                                if (
+                                    otherAllocation !==
+                                    allocation
+                                ) {
+
+                                    otherAllocation.classList.remove(
+                                        "selected"
+                                    );
+
+                                    otherAllocation.classList.remove(
+                                        "editing-name"
+                                    );
+
+                                    otherAllocation.classList.remove(
+                                        "editing-amount"
+                                    );
+
+
+                                    resetAllocationDeleteButton(
+                                        otherAllocation
+                                    );
+
+                                }
+
+                            }
+                        );
+
+
+                    allocation.classList.add(
+                        "selected"
+                    );
+
+                }
+            );
+
+
+            // ----------------------------------------
+            // Edit name
+            // ----------------------------------------
+
+            nameDisplay.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+
+                    selectAllocation(
+                        allocation
+                    );
+
+
+                    allocation.classList.add(
+                        "editing-name"
+                    );
+
+
+                    nameInput.focus();
+
+                    nameInput.select();
+
+                }
+            );
+
+
+            // ----------------------------------------
+            // Save name
+            // ----------------------------------------
+
+            nameInput.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key !==
+                        "Enter"
+                    ) {
+                        return;
+                    }
+
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    saveAllocationName();
+
+                }
+            );
+
+
+            nameInput.addEventListener(
+                "blur",
+                function () {
+
+                    if (
+                        savingName
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        allocation.classList.contains(
+                            "editing-name"
+                        )
+                    ) {
+
+                        saveAllocationName();
+
+                    }
+
+                }
+            );
+
+
+            function saveAllocationName() {
+
+                if (savingName) {
+                    return;
+                }
+
+
+                const name =
+                    nameInput.value.trim();
+
+
+                if (!name) {
+                    return;
+                }
+
+
+                const allocationId =
+                    allocation.dataset.allocationId;
+
+
+                savingName = true;
+
+
+                fetch(
+                    `/allocation/${allocationId}/name/`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded",
+
+                            "X-CSRFToken":
+                                getCookie(
+                                    "csrftoken"
+                                ),
+
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+                        },
+
+                        body:
+                            `name=${encodeURIComponent(
+                                name
+                            )}`,
+
+                    }
+                )
+                    .then(function (response) {
+
+                        return response.json();
+
+                    })
+                    .then(function (data) {
+
+                        if (
+                            data.success
+                        ) {
+
+                            updateDashboard(
+                                data
+                            );
+
+                        }
+
+                    })
+                    .finally(function () {
+
+                        savingName = false;
+
+                    });
+
+            }
+
+
+            // ----------------------------------------
+            // Cancel name editing
+            // ----------------------------------------
+
+            nameInput.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key !==
+                        "Escape"
+                    ) {
+                        return;
+                    }
+
+
+                    event.preventDefault();
+
+
+                    nameInput.value =
+                        nameInput.defaultValue;
+
+
+                    allocation.classList.remove(
+                        "editing-name"
+                    );
+
+                }
+            );
+
+
+            // ----------------------------------------
+            // Edit amount
+            // ----------------------------------------
+
+            amountDisplay.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+
+                    selectAllocation(
+                        allocation
+                    );
+
+
+                    allocation.classList.add(
+                        "editing-amount"
+                    );
+
+
+                    amountInput.focus();
+
+                    amountInput.select();
+
+                }
+            );
+
+
+            // ----------------------------------------
+            // Save amount
+            // ----------------------------------------
+
+            amountInput.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key !==
+                        "Enter"
+                    ) {
+                        return;
+                    }
+
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    saveAllocationAmount();
+
+                }
+            );
+
+
+            amountInput.addEventListener(
+                "blur",
+                function () {
+
+                    if (
+                        savingAmount
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        allocation.classList.contains(
+                            "editing-amount"
+                        )
+                    ) {
+
+                        saveAllocationAmount();
+
+                    }
+
+                }
+            );
+
+
+            function saveAllocationAmount() {
+
+                if (savingAmount) {
+                    return;
+                }
+
+
+                const amount =
+                    amountInput.value.trim();
+
+
+                if (!amount) {
+
+                    amountInput.value =
+                        amountInput.defaultValue;
+
+                    allocation.classList.remove(
+                        "editing-amount"
+                    );
+
+                    return;
+
+                }
+
+
+                const allocationId =
+                    allocation.dataset.allocationId;
+
+
+                savingAmount = true;
+
+
+                fetch(
+                    `/allocation/${allocationId}/amount/`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded",
+
+                            "X-CSRFToken":
+                                getCookie(
+                                    "csrftoken"
+                                ),
+
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+                        },
+
+                        body:
+                            `amount=${encodeURIComponent(
+                                amount
+                            )}`,
+
+                    }
+                )
+                    .then(function (response) {
+
+                        return response.json();
+
+                    })
+                    .then(function (data) {
+
+                        if (
+                            data.success
+                        ) {
+
+                            updateDashboard(
+                                data
+                            );
+
+                        }
+
+                    })
+                    .finally(function () {
+
+                        savingAmount = false;
+
+                    });
+
+            }
+
+
+            // ----------------------------------------
+            // Cancel amount editing
+            // ----------------------------------------
+
+            amountInput.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key !==
+                        "Escape"
+                    ) {
+                        return;
+                    }
+
+
+                    event.preventDefault();
+
+
+                    amountInput.value =
+                        amountInput.defaultValue;
+
+
+                    allocation.classList.remove(
+                        "editing-amount"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+// ----------------------------------------
+// Allocation deletion
+// ----------------------------------------
+
+function initializeAllocationDeletion() {
+
+    const deleteButtons =
+        document.querySelectorAll(
+            ".allocation-delete"
+        );
+
+
+    deleteButtons.forEach(
+        function (button) {
+
+            button.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+
+                    const allocation =
+                        button.closest(
+                            ".allocation"
+                        );
+
+
+                    if (!allocation) {
+                        return;
+                    }
+
+
+                    if (
+                        !button.classList.contains(
+                            "delete-confirm"
+                        )
+                    ) {
+
+                        document
+                            .querySelectorAll(
+                                ".allocation-delete.delete-confirm"
+                            )
+                            .forEach(
+                                function (
+                                    otherButton
+                                ) {
+
+                                    otherButton.classList.remove(
+                                        "delete-confirm"
+                                    );
+
+                                    otherButton.textContent =
+                                        "×";
+
+                                }
+                            );
+
+
+                        button.classList.add(
+                            "delete-confirm"
+                        );
+
+                        button.textContent =
+                            "✓";
+
+                        return;
+
+                    }
+
+
+                    const allocationId =
+                        allocation.dataset.allocationId;
+
+
+                    fetch(
+                        `/allocation/${allocationId}/delete/`,
+                        {
+
+                            method: "POST",
+
+                            headers: {
+                                "X-CSRFToken":
+                                    getCookie(
+                                        "csrftoken"
+                                    ),
+
+                                "X-Requested-With":
+                                    "XMLHttpRequest",
+                            },
+
+                        }
+                    )
+                        .then(function (response) {
+
+                            return response.json();
+
+                        })
+                        .then(function (data) {
+
+                            if (
+                                data.success
+                            ) {
+
+                                updateDashboard(
+                                    data
+                                );
+
+                            }
+
+                        });
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+// ----------------------------------------
+// Reset allocation delete button
+// ----------------------------------------
+
+function resetAllocationDeleteButton(
+    allocation
+) {
+
+    const button =
+        allocation.querySelector(
+            ".allocation-delete"
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    button.classList.remove(
+        "delete-confirm"
+    );
+
+    button.textContent =
+        "×";
+
+}
+
+
+// ----------------------------------------
+// Select an allocation
+// ----------------------------------------
+
+function selectAllocation(
+    allocation
+) {
+
+    document
+        .querySelectorAll(
+            ".allocation.selected"
+        )
+        .forEach(
+            function (
+                selectedAllocation
+            ) {
+
+                if (
+                    selectedAllocation !==
+                    allocation
+                ) {
+
+                    selectedAllocation.classList.remove(
+                        "selected"
+                    );
+
+                    selectedAllocation.classList.remove(
+                        "editing-name"
+                    );
+
+                    selectedAllocation.classList.remove(
+                        "editing-amount"
+                    );
+
+
+                    resetAllocationDeleteButton(
+                        selectedAllocation
+                    );
+
+                }
+
+            }
+        );
+
+
+    allocation.classList.add(
+        "selected"
+    );
+
+}
+
+
+// ----------------------------------------
+// Allocation drag-and-drop ordering
+// ----------------------------------------
+
+function initializeAllocationSorting() {
+
+    const allocationList =
+        document.querySelector(
+            ".allocation-list"
+        );
+
+
+    if (!allocationList) {
+        return;
+    }
+
+
+    new Sortable(
+        allocationList,
+        {
+
+            animation: 150,
+
+            delay: 200,
+
+            draggable: ".allocation",
+
+
+            onEnd: function () {
+
+                const allocationIds =
+                    Array.from(
+                        allocationList.querySelectorAll(
+                            ".allocation"
+                        )
+                    ).map(
+                        function (
+                            allocation
+                        ) {
+
+                            return allocation.dataset
+                                .allocationId;
+
+                        }
+                    );
+
+
+                fetch(
+                    "/allocation/reorder/",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            "X-CSRFToken":
+                                getCookie(
+                                    "csrftoken"
+                                ),
+
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+                        },
+
+                        body:
+                            JSON.stringify({
+                                allocation_ids:
+                                    allocationIds,
+                            }),
+
+                    }
+                );
+
+            },
+
+        }
+    );
+
+}
+
+
+// ----------------------------------------
+// Initial setup
+// ----------------------------------------
+
+initializeAllocationEditing();
+
+initializeAllocationSorting();
+
 initializeBillEditing();
+
 initializeBillSorting();
+
+
+const savedView =
+    localStorage.getItem(
+        "billio-dashboard-view"
+    );
+
+
+if (
+    savedView ===
+    "allocation"
+) {
+
+    showAllocationView();
+
+} else {
+
+    showBillsView();
+
+}
 
 
 // ----------------------------------------
@@ -1730,7 +3184,10 @@ if (updatePayModal) {
         "click",
         function (event) {
 
-            if (event.target === updatePayModal) {
+            if (
+                event.target ===
+                updatePayModal
+            ) {
 
                 updatePayModal.classList.remove(
                     "show"
@@ -1752,7 +3209,10 @@ document.addEventListener(
     "keydown",
     function (event) {
 
-        if (event.key === "Escape") {
+        if (
+            event.key ===
+            "Escape"
+        ) {
 
             if (updatePayModal) {
 
@@ -1776,17 +3236,29 @@ document.addEventListener(
     "click",
     function (event) {
 
-        if (!event.target.closest(".bill")) {
+        if (
+            !event.target.closest(
+                ".bill"
+            )
+        ) {
 
             document
-                .querySelectorAll(".bill.selected")
-                .forEach(function (bill) {
+                .querySelectorAll(
+                    ".bill.selected"
+                )
+                .forEach(
+                    function (bill) {
 
-                    bill.classList.remove(
-                        "selected"
-                    );
+                        bill.classList.remove(
+                            "selected"
+                        );
 
-                });
+                        resetBillDeleteButton(
+                            bill
+                        );
+
+                    }
+                );
 
         }
 

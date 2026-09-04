@@ -108,6 +108,46 @@ body {
     border-radius: 24px;
 
     padding: 24px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.card:not(.active) {
+    opacity: 0.65;
+}
+
+.card.active {
+    opacity: 1;
+}
+
+
+/* ----------------------------------------
+   Update Paycheck Button
+---------------------------------------- */
+
+.update-pay-button {
+    margin-top: 10px;
+
+    padding: 5px 10px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #f5f5f7;
+    color: #1d1d1f;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.update-pay-button:hover {
+    background: #e8e8ed;
 }
 
 
@@ -153,6 +193,19 @@ body {
 
 
 /* ----------------------------------------
+   Dashboard Views
+---------------------------------------- */
+
+.dashboard-view {
+    display: none;
+}
+
+.dashboard-view.active {
+    display: block;
+}
+
+
+/* ----------------------------------------
    Bills Section
 ---------------------------------------- */
 
@@ -182,23 +235,50 @@ body {
 
 
 /* ----------------------------------------
-   Bill Row
+   Shared Table Row
 ---------------------------------------- */
 
-.bill {
+.bill,
+.allocation {
     position: relative;
 
     padding: 18px 0;
 
     border-bottom: 1px solid #f0f0f0;
+
+    cursor: pointer;
 }
 
-.bill:last-child {
+.bill:last-child,
+.allocation:last-child {
     border-bottom: none;
 }
 
+
+/* ----------------------------------------
+   Bill Outside Period
+---------------------------------------- */
+
 .bill-outside-period {
     opacity: 0.4;
+}
+
+
+/* ----------------------------------------
+   Shared Primary Row
+---------------------------------------- */
+
+.bill-main,
+.allocation-main {
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    align-items: start;
+
+    gap: 24px;
+
+    min-height: 19px;
 }
 
 
@@ -208,24 +288,39 @@ body {
 
 .bill-main {
     display: grid;
+
     grid-template-columns: 1fr auto;
+
     align-items: start;
+
     gap: 24px;
+
     min-height: 19px;
 }
 
+
 /* ----------------------------------------
-   Bill Name
+   Shared Name
 ---------------------------------------- */
 
-.bill-name {
+.bill-name,
+.allocation-name {
     display: inline-block;
+
     width: fit-content;
+
+    min-width: 0;
 
     cursor: pointer;
 }
 
-.bill-name-display {
+
+/* ----------------------------------------
+   Shared Name Display
+---------------------------------------- */
+
+.bill-name-display,
+.allocation-name-display {
     display: block;
 
     font-size: 17px;
@@ -240,10 +335,11 @@ body {
 
 
 /* ----------------------------------------
-   Inline Editing — Name
+   Shared Name Input
 ---------------------------------------- */
 
-.bill-name-input {
+.bill-name-input,
+.allocation-name-input {
     display: none;
 
     width: auto;
@@ -269,46 +365,58 @@ body {
     outline: none;
 }
 
-.bill-name.editing .bill-name-display {
+.bill-name.editing .bill-name-display,
+.allocation.editing-name .allocation-name-display {
     display: none;
 }
 
-.bill-name.editing .bill-name-input {
+.bill-name.editing .bill-name-input,
+.allocation.editing-name .allocation-name-input {
     display: inline-block;
 }
 
-
-/* ----------------------------------------
-   Inline Editing — Name Focus
----------------------------------------- */
-
-.bill-name-input:focus {
+.bill-name-input:focus,
+.allocation-name-input:focus {
     border-bottom-color: #a1a1a6;
 }
 
 
 /* ----------------------------------------
-   Bill Amount Area
+   Shared Amount Area
 ---------------------------------------- */
 
-.bill-amount-area {
+.bill-amount-area,
+.allocation-amount-area {
     display: flex;
+
     align-items: flex-start;
+
     gap: 4px;
+
     flex-shrink: 0;
 }
 
+
 /* ----------------------------------------
-   Bill Amount
+   Shared Amount
 ---------------------------------------- */
 
-.bill-amount {
+.bill-amount,
+.allocation-amount {
     flex-shrink: 0;
 
     text-align: right;
 }
 
-.bill-amount-display {
+
+/* ----------------------------------------
+   Shared Amount Display
+---------------------------------------- */
+
+.bill-amount-display,
+.allocation-amount-display {
+    display: block;
+
     font-size: 17px;
     font-weight: 600;
 
@@ -319,10 +427,11 @@ body {
 
 
 /* ----------------------------------------
-   Inline Editing — Amount
+   Shared Amount Input
 ---------------------------------------- */
 
-.bill-amount-input {
+.bill-amount-input,
+.allocation-amount-input {
     display: none;
 
     width: 90px;
@@ -331,6 +440,7 @@ body {
     border-bottom: 1px solid #d2d2d7;
 
     padding: 0;
+    margin: 0;
 
     font-family: inherit;
     font-size: 17px;
@@ -347,53 +457,72 @@ body {
     line-height: normal;
 }
 
-.bill-amount.editing .bill-amount-display {
+.bill-amount.editing .bill-amount-display,
+.allocation.editing-amount .allocation-amount-display {
     display: none;
 }
 
-.bill-amount.editing .bill-amount-input {
+.bill-amount.editing .bill-amount-input,
+.allocation.editing-amount .allocation-amount-input {
     display: block;
 }
 
-
-/* ----------------------------------------
-   Active Inline Input
----------------------------------------- */
-
-.bill-amount-input:focus {
+.bill-amount-input:focus,
+.allocation-amount-input:focus {
     border-bottom-color: #a1a1a6;
 }
 
 
 /* ----------------------------------------
-   Bill Delete X
+   Shared Delete X
 ---------------------------------------- */
 
-.bill .bill-delete {
+.bill .bill-delete,
+.allocation .allocation-delete {
     display: none;
+
     position: static;
+
     align-self: flex-start;
+
     width: 28px;
     height: 28px;
+
     padding: 0;
+
     border: none;
     border-radius: 50%;
+
     background: transparent;
+
     color: #86868b;
+
     font-family: inherit;
+
     font-size: 22px;
     font-weight: 400;
+
     line-height: 28px;
+
     cursor: pointer;
+
     flex-shrink: 0;
+
     transform: translateY(-5.5px);
 }
 
-.bill.selected .bill-delete {
+.bill.selected .bill-delete,
+.allocation.selected .allocation-delete {
     display: block;
 }
 
-.bill .bill-delete:hover {
+
+/* ----------------------------------------
+   Shared Delete Hover
+---------------------------------------- */
+
+.bill .bill-delete:hover,
+.allocation .allocation-delete:hover {
     background: #f5f5f7;
 
     color: #1d1d1f;
@@ -403,16 +532,18 @@ body {
 
 
 /* ----------------------------------------
-   Delete Confirmation
+   Shared Delete Confirmation
 ---------------------------------------- */
 
-.bill .bill-delete.delete-confirm {
+.bill .bill-delete.delete-confirm,
+.allocation .allocation-delete.delete-confirm {
     color: #1d1d1f;
 
     background: #f5f5f7;
 }
 
-.bill .bill-delete.delete-confirm:hover {
+.bill .bill-delete.delete-confirm:hover,
+.allocation .allocation-delete.delete-confirm:hover {
     background: #e5e5e7;
 }
 
@@ -527,6 +658,57 @@ body {
 }
 
 .bill-frequency.editing .bill-frequency-input {
+    display: block;
+}
+
+
+/* ----------------------------------------
+   Allocation List
+---------------------------------------- */
+
+.allocation-list-container {
+    width: 100%;
+}
+
+.allocation-list {
+    width: 100%;
+}
+
+
+/* ----------------------------------------
+   Allocation Main Row
+---------------------------------------- */
+
+.allocation-main {
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    align-items: start;
+
+    gap: 24px;
+
+    min-height: 19px;
+}
+
+
+/* ----------------------------------------
+   Allocation Editing States
+---------------------------------------- */
+
+.allocation.editing-name .allocation-name-display {
+    display: none;
+}
+
+.allocation.editing-name .allocation-name-input {
+    display: inline-block;
+}
+
+.allocation.editing-amount .allocation-amount-display {
+    display: none;
+}
+
+.allocation.editing-amount .allocation-amount-input {
     display: block;
 }
 
@@ -730,6 +912,7 @@ button:hover {
 
 .bill-group-label {
     margin-top: 18px;
+
     padding: 18px 0 8px;
 
     color: #86868b;
@@ -738,6 +921,7 @@ button:hover {
     font-weight: 500;
 
     text-transform: uppercase;
+
     letter-spacing: 0.5px;
 }
 
@@ -798,22 +982,26 @@ button:hover {
     }
 
 
-    .bill-main {
+    .bill-main,
+    .allocation-main {
         gap: 16px;
     }
 
 
-    .bill-name-display {
+    .bill-name-display,
+    .allocation-name-display {
         font-size: 16px;
     }
 
 
-    .bill-amount-display {
+    .bill-amount-display,
+    .allocation-amount-display {
         font-size: 16px;
     }
 
 
-    .bill .bill-delete {
+    .bill .bill-delete,
+    .allocation .allocation-delete {
         position: static;
 
         width: 28px;
@@ -821,6 +1009,12 @@ button:hover {
 
         font-size: 22px;
         line-height: 28px;
+    }
+
+
+    .bill,
+    .allocation {
+        padding: 18px 0;
     }
 
 
@@ -838,4 +1032,9 @@ button:hover {
         border-radius: 24px 24px 0 0;
     }
 
+}
+
+#upcoming-bills {
+    margin-top: 12px;
+    border-top: 1px solid #f0f0f0;
 }

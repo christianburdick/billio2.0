@@ -10,6 +10,11 @@ from budget.views import (
     update_bill_name,
     update_bill_date,
     reorder_bills,
+    add_allocation,
+    update_allocation_name,
+    update_allocation_amount,
+    reorder_allocations,
+    delete_allocation,
 )
 
 urlpatterns = [
@@ -67,4 +72,33 @@ urlpatterns = [
         name="reorder_bills",
     ),
 
+    path(
+    "allocation/add/",
+    add_allocation,
+    name="add_allocation",
+    ),
+
+    path(
+    "allocation/<int:allocation_id>/name/",
+    update_allocation_name,
+    name="update_allocation_name",
+    ),
+
+    path(
+    "allocation/<int:allocation_id>/amount/",
+    update_allocation_amount,
+    name="update_allocation_amount",
+    ),
+
+    path(
+    "allocation/reorder/",
+    reorder_allocations,
+    name="reorder_allocations",
+    ),
+
+    path(
+    "allocation/<int:allocation_id>/delete/",
+    delete_allocation,
+    name="delete_allocation",
+    ),
 ]

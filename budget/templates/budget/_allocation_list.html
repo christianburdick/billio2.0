@@ -1,0 +1,69 @@
+<div class="allocation-list">
+
+    {% for allocation in allocations %}
+
+        <div
+            class="allocation"
+            data-allocation-id="{{ allocation.id }}"
+        >
+
+            <div class="allocation-main">
+
+                <div class="allocation-name">
+
+                    <span class="allocation-name-display">
+                        {{ allocation.name }}
+                    </span>
+
+                    <input
+                        class="allocation-name-input"
+                        type="text"
+                        value="{{ allocation.name }}"
+                        maxlength="100"
+                    >
+
+                </div>
+
+
+                <div class="allocation-amount-area">
+
+                    <div class="allocation-amount">
+
+                        <span class="allocation-amount-display">
+                            ${{ allocation.amount|floatformat:2 }}
+                        </span>
+
+                        <input
+                            class="allocation-amount-input"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value="{{ allocation.amount }}"
+                        >
+
+                    </div>
+
+
+                    <button
+                        class="allocation-delete"
+                        type="button"
+                        aria-label="Delete {{ allocation.name }}"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <div class="empty">
+            No allocations yet.
+        </div>
+
+    {% endfor %}
+
+</div>
