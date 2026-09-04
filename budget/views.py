@@ -13,7 +13,6 @@ from .calculations import (
     calculate_remaining,
 )
 
-
 def get_dashboard_data():
 
     income = Income.objects.order_by("-pay_date").first()
@@ -56,6 +55,30 @@ def get_dashboard_data():
         key=lambda item: item[0].sort_order
     )
 
+    # Group occurrences by bill for the UI.
+
+    bill_occurrences_by_bill = {}
+
+    for bill, occurrence_date in bill_occurrences:
+
+        if bill.id not in bill_occurrences_by_bill:
+
+            bill_occurrences_by_bill[bill.id] = {
+                "bill": bill,
+                "occurrence_dates": [],
+            }
+
+        bill_occurrences_by_bill[
+            bill.id
+        ]["occurrence_dates"].append(
+            occurrence_date
+        )
+
+    grouped_bill_occurrences = sorted(
+        bill_occurrences_by_bill.values(),
+        key=lambda item: item["bill"].sort_order
+    )
+
     bills_outside_period = sorted(
         [
             bill
@@ -70,7 +93,13 @@ def get_dashboard_data():
         "bills": bills,
         "period_start": period_start,
         "period_end": period_end,
+
+        # Original occurrence structure.
         "bill_occurrences": bills_in_period_list,
+
+        # Grouped structure for the UI.
+        "grouped_bill_occurrences": grouped_bill_occurrences,
+
         "bills_in_period": bills_in_period,
         "bills_outside_period": bills_outside_period,
         "total_bills": total_bills,
@@ -87,6 +116,10 @@ def dashboard_json():
         {
             "bill_occurrences": dashboard.get(
                 "bill_occurrences",
+                []
+            ),
+            "grouped_bill_occurrences": dashboard.get(
+                "grouped_bill_occurrences",
                 []
             ),
             "bills_outside_period": dashboard.get(

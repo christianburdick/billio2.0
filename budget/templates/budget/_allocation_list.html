@@ -1,0 +1,69 @@
+<div class="allocation-list">
+
+    {% for allocation in allocations %}
+
+        <div
+            class="bill allocation"
+            data-allocation-id="{{ allocation.id }}"
+        >
+
+            <div class="bill-main">
+
+                <div
+                    class="bill-name"
+                    data-allocation-id="{{ allocation.id }}"
+                >
+
+                    <span class="bill-name-display">
+                        {{ allocation.name }}
+                    </span>
+
+                    <input
+                        class="bill-name-input"
+                        type="text"
+                        value="{{ allocation.name }}"
+                        maxlength="100"
+                    >
+
+                </div>
+
+
+                <div class="bill-amount-area">
+
+                    <div
+                        class="bill-amount"
+                        data-allocation-id="{{ allocation.id }}"
+                    >
+
+                        <span class="bill-amount-display">
+                            ${{ allocation.amount|floatformat:2 }}
+                        </span>
+
+                        <input
+                            class="bill-amount-input"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value="{{ allocation.amount }}"
+                        >
+
+                    </div>
+
+
+                    <button
+                        class="bill-delete"
+                        type="button"
+                        aria-label="Delete {{ allocation.name }}"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endfor %}
+
+</div>
