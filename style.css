@@ -835,9 +835,6 @@ button:hover {
 
 }
 
-#upcoming-bills.has-upcoming-bills {
-    border-top: 1px solid #e5e5e7;
-}
 
 .bill-date-display.outside-period {
     color: #b0b0b5;
