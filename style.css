@@ -771,6 +771,7 @@ button:hover {
         font-size: 44px;
     }
 
+
     .cards {
         grid-template-columns: repeat(2, 1fr);
 
@@ -819,6 +820,18 @@ button:hover {
     }
 
 
+    /* Prevent the native iPhone date input
+       from overflowing the modal */
+
+    .form-field input[type="date"] {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+
+        -webkit-appearance: none;
+    }
+
+
     .modal {
         align-items: flex-end;
 
@@ -832,7 +845,6 @@ button:hover {
 
         border-radius: 24px 24px 0 0;
     }
-
 }
 
 

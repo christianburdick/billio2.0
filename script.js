@@ -1154,26 +1154,51 @@ function renderBills(
             );
     }
 
+    const incompleteBills =
+        bills.filter(
+            bill =>
+                bill.name === "Untitled" ||
+                Number(bill.amount) === 0
+        );
+
 
     const currentBills =
         bills.filter(
             bill =>
-                occurrencesByBill.has(
-                    bill.id
-                )
+                occurrencesByBill.has(bill.id) &&
+                bill.name !== "Untitled" &&
+                Number(bill.amount) !== 0
         );
 
 
     const upcomingBills =
         bills.filter(
             bill =>
-                !occurrencesByBill.has(
-                    bill.id
-                )
+                !occurrencesByBill.has(bill.id) &&
+                bill.name !== "Untitled" &&
+                Number(bill.amount) !== 0
         );
 
-
     let currentHtml = "";
+
+    let upcomingHtml = "";
+
+
+    for (
+        const bill
+        of incompleteBills
+    ) {
+
+        currentHtml +=
+            createBillHtml(
+                bill,
+                occurrencesByBill.get(
+                    bill.id
+                ) || [],
+                periodStart,
+                periodEnd
+            );
+    }
 
 
     for (
@@ -1193,9 +1218,6 @@ function renderBills(
     }
 
 
-    let upcomingHtml = "";
-
-
     for (
         const bill
         of upcomingBills
@@ -1209,7 +1231,6 @@ function renderBills(
                 periodEnd
             );
     }
-
 
     if (
         currentHtml === "" &&
@@ -1270,33 +1291,75 @@ async function saveBillOrder() {
             ".bill"
         );
 
+    const bills =
+        await getBills();
+
+    const billMap =
+        new Map(
+            bills.map(
+                bill => [
+                    String(bill.id),
+                    bill
+                ]
+            )
+        );
+
+    let sortOrder = 0;
+
     for (
-        let i = 0;
-        i < billElements.length;
-        i++
+        const billElement
+        of billElements
     ) {
 
-        const billId =
-            billElements[i].dataset.billId;
+        const bill =
+            billMap.get(
+                String(
+                    billElement.dataset.billId
+                )
+            );
+
+        if (!bill) {
+            continue;
+        }
+
+
+        const isIncomplete =
+            bill.name === "Untitled" ||
+            Number(bill.amount) === 0;
+
+
+        if (isIncomplete) {
+            continue;
+        }
+
 
         await fetch(
-            `${SUPABASE_URL}/rest/v1/bills?id=eq.${billId}`,
+            `${SUPABASE_URL}/rest/v1/bills?id=eq.${bill.id}`,
             {
                 method: "PATCH",
+
                 headers: {
                     apikey:
                         SUPABASE_KEY,
+
                     Authorization:
                         `Bearer ${SUPABASE_KEY}`,
+
                     "Content-Type":
                         "application/json",
                 },
+
                 body: JSON.stringify({
-                    sort_order: i
+                    sort_order:
+                        sortOrder
                 }),
             }
         );
+
+
+        sortOrder++;
     }
+
 
     await loadDashboard();
 }
@@ -2123,7 +2186,6 @@ async function addBill() {
     const bills =
         await getBills();
 
-
     const sortOrders =
         bills.map(
             bill =>
@@ -2139,7 +2201,6 @@ async function addBill() {
                 ...sortOrders
             ) + 1
             : 0;
-
 
     const response =
         await fetch(
