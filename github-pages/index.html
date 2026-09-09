@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Bill.io</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+<body>
+
+<div class="container">
+
+<header class="header">
+
+    <h1>Bill.io</h1>
+
+    <p>Your money, organized.</p>
+
+</header>
+
+
+<!-- Current Pay Period -->
+
+<section class="hero">
+
+    <div class="hero-label">
+        Remaining this pay period
+    </div>
+
+    <div class="hero-amount">
+        $0.00
+    </div>
+
+    <div class="pay-period">
+        Loading...
+    </div>
+
+</section>
+
+
+<!-- Paycheck / Bills Summary -->
+
+<section class="cards">
+
+    <div
+        class="card paycheck-card"
+        id="paycheck-card"
+    >
+
+        <div class="card-label">
+            Paycheck
+        </div>
+
+        <div class="card-value paycheck-amount">
+            $0.00
+        </div>
+
+        <div class="card-action">
+            Update
+        </div>
+
+    </div>
+
+
+    <div
+        class="card"
+        id="bills-card"
+    >
+
+        <div class="card-label">
+            Bills
+        </div>
+
+        <div class="card-value bills-total">
+            $0.00
+        </div>
+
+        <div class="card-action">
+            Add
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- Bills This Period -->
+
+<section class="bills-section">
+
+    <div class="section-title">
+        Bills
+    </div>
+
+    <div class="bills-list">
+
+    </div>
+
+</section>
+
+
+<!-- Update Paycheck -->
+
+<div
+    id="update-pay-modal"
+    class="modal"
+>
+
+    <section
+        class="form-section"
+    >
+
+        <div class="section-title">
+            Update Paycheck
+        </div>
+
+
+        <form
+            id="income-form"
+            class="bill-form"
+        >
+
+            <div class="form-field">
+
+                <label for="income-amount">
+                    Paycheck
+                </label>
+
+                <input
+                    id="income-amount"
+                    name="amount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="income-pay-date">
+                    Pay date
+                </label>
+
+                <input
+                    id="income-pay-date"
+                    name="pay_date"
+                    type="date"
+                >
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="income-frequency">
+                    Frequency
+                </label>
+
+                <select
+                    id="income-frequency"
+                    name="frequency"
+                >
+
+                    <option value="weekly">
+                        Weekly
+                    </option>
+
+                    <option value="biweekly">
+                        Every 2 weeks
+                    </option>
+
+                    <option value="monthly">
+                        Monthly
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button type="submit">
+                Save
+            </button>
+
+        </form>
+
+    </section>
+
+</div>
+
+
+<!-- Add Paycheck -->
+
+<section
+    class="bills-section"
+    id="add-paycheck-section"
+>
+
+    <div class="section-title">
+        Add Your Paycheck
+    </div>
+
+
+    <form
+        id="add-income-form"
+        class="bill-form"
+    >
+
+        <div class="form-field">
+
+            <label for="add-income-amount">
+                Paycheck
+            </label>
+
+            <input
+                id="add-income-amount"
+                name="amount"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-field">
+
+            <label for="add-income-pay-date">
+                Pay date
+            </label>
+
+            <input
+                id="add-income-pay-date"
+                name="pay_date"
+                type="date"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-field">
+
+            <label for="add-income-frequency">
+                Frequency
+            </label>
+
+            <select
+                id="add-income-frequency"
+                name="frequency"
+                required
+            >
+
+                <option value="weekly">
+                    Weekly
+                </option>
+
+                <option value="biweekly">
+                    Every 2 weeks
+                </option>
+
+                <option value="monthly">
+                    Monthly
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button type="submit">
+            Save Paycheck
+        </button>
+
+    </form>
+
+</section>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
