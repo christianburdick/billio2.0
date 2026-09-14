@@ -1237,7 +1237,6 @@ function isBillComplete(
     );
 }
 
-
 function updateBillCompletion(
     bill
 ) {
@@ -1252,17 +1251,14 @@ function updateBillCompletion(
             bill.id
         );
 
-
         billSetupProgress.delete(
             bill.id
         );
-
 
         const billElement =
             document.querySelector(
                 `.bill[data-bill-id="${bill.id}"]`
             );
-
 
         if (billElement) {
 
@@ -1359,13 +1355,19 @@ function createBillHtml(
                             $${amount}
                         </span>
 
-                        <input
-                            class="bill-amount-input"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value="${amount}"
-                        >
+                        <div class="bill-amount-edit">
+
+                            <span class="bill-amount-dollar">$</span>
+
+                            <input
+                                class="bill-amount-input"
+                                type="text"
+                                inputmode="decimal"
+                                maxlength="10"
+                                value="${amount}"
+                            >
+
+                        </div>
 
                     </div>
 
@@ -1387,67 +1389,34 @@ function createBillHtml(
 
                 <div class="bill-details-row">
 
-                    <div
+                    <select
                         class="bill-frequency"
                         data-bill-id="${bill.id}"
                     >
+                        <option value="one_time" ${bill.frequency === "one_time" ? "selected" : ""}>
+                            One time
+                        </option>
 
-                        <span class="bill-frequency-display">
-                            ${getFrequencyLabel(
-                                bill.frequency
-                            )}
-                        </span>
+                        <option value="weekly" ${bill.frequency === "weekly" ? "selected" : ""}>
+                            Weekly
+                        </option>
 
-                        <select
-                            class="bill-frequency-input"
-                        >
+                        <option value="biweekly" ${bill.frequency === "biweekly" ? "selected" : ""}>
+                            Biweekly
+                        </option>
 
-                            <option
-                                value="one_time"
-                                ${bill.frequency === "one_time" ? "selected" : ""}
-                            >
-                                One time
-                            </option>
+                        <option value="monthly" ${bill.frequency === "monthly" ? "selected" : ""}>
+                            Monthly
+                        </option>
 
-                            <option
-                                value="weekly"
-                                ${bill.frequency === "weekly" ? "selected" : ""}
-                            >
-                                Weekly
-                            </option>
+                        <option value="quarterly" ${bill.frequency === "quarterly" ? "selected" : ""}>
+                            Quarterly
+                        </option>
 
-                            <option
-                                value="biweekly"
-                                ${bill.frequency === "biweekly" ? "selected" : ""}
-                            >
-                                Every 2 weeks
-                            </option>
-
-                            <option
-                                value="monthly"
-                                ${bill.frequency === "monthly" ? "selected" : ""}
-                            >
-                                Monthly
-                            </option>
-
-                            <option
-                                value="quarterly"
-                                ${bill.frequency === "quarterly" ? "selected" : ""}
-                            >
-                                Every 3 months
-                            </option>
-
-                            <option
-                                value="yearly"
-                                ${bill.frequency === "yearly" ? "selected" : ""}
-                            >
-                                Yearly
-                            </option>
-
-                        </select>
-
-                    </div>
-
+                        <option value="yearly" ${bill.frequency === "yearly" ? "selected" : ""}>
+                            Yearly
+                        </option>
+                    </select>
 
                     <div
                         class="bill-date"
@@ -1455,23 +1424,66 @@ function createBillHtml(
                     >
 
                         <span class="bill-date-display">
+                            ${new Date(bill.due_date + "T00:00:00").toLocaleDateString(
+                                "en-US",
+                                {
+                                    month: "short",
+                                    day: "numeric"
+                                }
+                            )}
 
-                            <span class="bill-date-normal">
-                                ${formatBillDate(
-                                    parseDate(
-                                        bill.due_date
-                                    )
-                                )}
-                            </span>
+                            <svg
+                                class="bill-date-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <rect
+                                    x="4"
+                                    y="5"
+                                    width="16"
+                                    height="15"
+                                    rx="3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                />
 
+                                <line
+                                    x1="4"
+                                    y1="9"
+                                    x2="20"
+                                    y2="9"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                />
+
+                                <line
+                                    x1="8"
+                                    y1="3"
+                                    x2="8"
+                                    y2="7"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                />
+
+                                <line
+                                    x1="16"
+                                    y1="3"
+                                    x2="16"
+                                    y2="7"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                />
+                            </svg>
                         </span>
-
+                        
                         <input
                             class="bill-date-input"
                             type="date"
                             value="${bill.due_date}"
                         >
-
                     </div>
 
                 </div>
@@ -1496,6 +1508,20 @@ function renderBills(
 
 
     if (!billsList) {
+
+        return;
+    }
+
+
+    if (
+        bills.length === 0
+    ) {
+
+        billsList.innerHTML = `
+            <div class="no-bills">
+                No bills yet.
+            </div>
+        `;
 
         return;
     }
@@ -1534,20 +1560,26 @@ function renderBills(
 
 
     const incompleteBills =
+    bills.filter(
+        bill =>
+            !isBillComplete(
+                bill
+            )
+    );
+
+
+    const completedBills =
         bills.filter(
             bill =>
-                !isBillComplete(
+                isBillComplete(
                     bill
                 )
         );
 
 
     const currentBills =
-        bills.filter(
+        completedBills.filter(
             bill =>
-                isBillComplete(
-                    bill
-                ) &&
                 occurrencesByBill.has(
                     bill.id
                 )
@@ -1555,11 +1587,8 @@ function renderBills(
 
 
     const upcomingBills =
-        bills.filter(
+        completedBills.filter(
             bill =>
-                isBillComplete(
-                    bill
-                ) &&
                 !occurrencesByBill.has(
                     bill.id
                 )
@@ -1662,7 +1691,7 @@ function renderBills(
         ).matches;
 
 
-    new Sortable(
+        new Sortable(
         document.getElementById(
             "current-bills"
         ),
@@ -1680,11 +1709,31 @@ function renderBills(
                     ? 5
                     : 0,
 
+            filter:
+                ".incomplete, .incomplete *",
+
+            preventOnFilter:
+                false,
+
+            onMove:
+                function(event) {
+
+                    if (
+                        event.related &&
+                        event.related.classList.contains(
+                            "incomplete"
+                        )
+                    ) {
+                        return false;
+                    }
+
+                    return true;
+                },
+
             onEnd:
                 saveBillOrder
         }
     );
-
 
     new Sortable(
         document.getElementById(
@@ -1932,7 +1981,6 @@ function startBillNameEditing(
     nameInput.select();
 }
 
-
 function initializeBillNames() {
 
     document
@@ -1970,6 +2018,42 @@ function initializeBillNames() {
                 }
 
 
+                function resizeNameInput() {
+
+                    const measure =
+                        document.createElement(
+                            "span"
+                        );
+
+                    measure.style.position =
+                        "absolute";
+
+                    measure.style.visibility =
+                        "hidden";
+
+                    measure.style.whiteSpace =
+                        "pre";
+
+                    measure.style.font =
+                        getComputedStyle(
+                            input
+                        ).font;
+
+                    measure.textContent =
+                        input.value ||
+                        "Untitled";
+
+                    document.body.appendChild(
+                        measure
+                    );
+
+                    input.style.width =
+                        `${measure.offsetWidth + 2}px`;
+
+                    measure.remove();
+                }
+
+
                 display.addEventListener(
                     "click",
                     function(event) {
@@ -1986,6 +2070,9 @@ function initializeBillNames() {
                         );
 
 
+                        resizeNameInput();
+
+
                         input.focus();
 
                         input.select();
@@ -1998,6 +2085,15 @@ function initializeBillNames() {
                     function(event) {
 
                         event.stopPropagation();
+                    }
+                );
+
+
+                input.addEventListener(
+                    "input",
+                    function() {
+
+                        resizeNameInput();
                     }
                 );
 
@@ -2278,7 +2374,6 @@ function initializeBillNames() {
         );
 }
 
-
 function initializeBillAmounts() {
 
     document
@@ -2316,6 +2411,43 @@ function initializeBillAmounts() {
                 }
 
 
+                function resizeAmountInput() {
+
+                    const measure =
+                        document.createElement(
+                            "span"
+                        );
+
+                    measure.style.position =
+                        "absolute";
+
+                    measure.style.visibility =
+                        "hidden";
+
+                    measure.style.whiteSpace =
+                        "pre";
+
+                    measure.style.font =
+                        getComputedStyle(
+                            input
+                        ).font;
+
+                    measure.textContent =
+                        input.value || "0.00";
+
+                    document.body.appendChild(
+                        measure
+                    );
+
+
+                    input.style.width =
+                        `${measure.offsetWidth + 2}px`;
+
+
+                    measure.remove();
+                }
+
+
                 display.addEventListener(
                     "click",
                     function(event) {
@@ -2338,6 +2470,9 @@ function initializeBillAmounts() {
                         );
 
 
+                        resizeAmountInput();
+
+
                         input.focus();
 
                         input.select();
@@ -2350,6 +2485,73 @@ function initializeBillAmounts() {
                     function(event) {
 
                         event.stopPropagation();
+                    }
+                );
+
+
+                input.addEventListener(
+                    "input",
+                    function() {
+
+                        let value =
+                            input.value.replace(
+                                /[^0-9.]/g,
+                                ""
+                            );
+
+
+                        const decimalIndex =
+                            value.indexOf(
+                                "."
+                            );
+
+
+                        if (
+                            decimalIndex !== -1
+                        ) {
+
+                            const wholePart =
+                                value.slice(
+                                    0,
+                                    decimalIndex
+                                );
+
+                            const decimalPart =
+                                value
+                                    .slice(
+                                        decimalIndex + 1
+                                    )
+                                    .replace(
+                                        /\./g,
+                                        ""
+                                    );
+
+                            value =
+                                wholePart.slice(
+                                    0,
+                                    8
+                                ) +
+                                "." +
+                                decimalPart.slice(
+                                    0,
+                                    2
+                                );
+                        }
+
+                        else {
+
+                            value =
+                                value.slice(
+                                    0,
+                                    8
+                                );
+                        }
+
+
+                        input.value =
+                            value;
+
+                        resizeAmountInput();
                     }
                 );
 
@@ -2660,7 +2862,6 @@ function initializeBillAmounts() {
         );
 }
 
-
 function initializeBillDates() {
 
     document
@@ -2670,57 +2871,24 @@ function initializeBillDates() {
         .forEach(
             dateArea => {
 
-                const display =
+                const dateDisplay =
                     dateArea.querySelector(
                         ".bill-date-display"
                     );
 
-
-                const input =
+                const dateInput =
                     dateArea.querySelector(
                         ".bill-date-input"
                     );
 
-
-                const bill =
-                    dateArea.closest(
-                        ".bill"
-                    );
-
-
                 if (
-                    !display ||
-                    !input ||
-                    !bill
+                    !dateDisplay ||
+                    !dateInput
                 ) {
-
                     return;
                 }
 
-
-                display.addEventListener(
-                    "click",
-                    function(event) {
-
-                        event.stopPropagation();
-
-
-                        selectBill(
-                            bill
-                        );
-
-
-                        dateArea.classList.add(
-                            "editing"
-                        );
-
-
-                        input.focus();
-                    }
-                );
-
-
-                input.addEventListener(
+                dateDisplay.addEventListener(
                     "click",
                     function(event) {
 
@@ -2728,38 +2896,34 @@ function initializeBillDates() {
                     }
                 );
 
+                dateInput.addEventListener(
+                    "click",
+                    function(event) {
 
-                input.addEventListener(
+                        event.stopPropagation();
+                    }
+                );
+
+                dateInput.addEventListener(
                     "change",
                     async function() {
 
-                        const date =
-                            input.value;
-
-
-                        if (!date) {
-
-                            return;
-                        }
-
+                        const dueDate =
+                            dateInput.value;
 
                         const headers =
                             await getAuthHeaders();
 
-
                         if (!headers) {
-
                             console.error(
                                 "No authenticated session."
                             );
-
                             return;
                         }
 
-
                         const response =
                             await fetch(
-                                `${SUPABASE_URL}/rest/v1/bills?id=eq.${bill.dataset.billId}`,
+                                `${SUPABASE_URL}/rest/v1/bills?id=eq.${dateArea.dataset.billId}`,
                                 {
                                     method:
                                         "PATCH",
@@ -2774,107 +2938,69 @@ function initializeBillDates() {
                                     body:
                                         JSON.stringify({
                                             due_date:
-                                                date,
+                                                dueDate,
                                         }),
                                 }
                             );
 
-
                         if (!response.ok) {
-
-                            console.error(
-                                "Failed to update bill date:",
-                                await response.text()
-                            );
-
-
-                            return;
-                        }
+                        console.error(
+                            "Failed to update bill date:",
+                            await response.text()
+                        );
+                        return;
+                    }
 
 
-                        dateArea.classList.remove(
-                            "editing"
+                    const billId =
+                        Number(
+                            dateArea.dataset.billId
                         );
 
 
-                        const billId =
-                            Number(
-                                bill.dataset.billId
+                    if (
+                        billSetupProgress.has(
+                            billId
+                        )
+                    ) {
+
+                        billSetupProgress.get(
+                            billId
+                        ).date =
+                            Boolean(
+                                dueDate
                             );
-
-
-                        if (
-                            billSetupProgress.has(
-                                billId
-                            )
-                        ) {
-
-                            billSetupProgress.get(
-                                billId
-                            ).date =
-                                Boolean(
-                                    date
-                                );
-                        }
-
-
-                        const bills =
-                            await getBills();
-
-
-                        const updatedBill =
-                            bills.find(
-                                item =>
-                                    String(item.id) ===
-                                    String(
-                                        bill.dataset.billId
-                                    )
-                            );
-
-
-                        if (updatedBill) {
-
-                            updateBillCompletion(
-                                updatedBill
-                            );
-                        }
-
-
-                        await loadDashboard();
                     }
-                );
 
 
-                input.addEventListener(
-                    "keydown",
-                    function(event) {
-
-                        if (
-                            event.key ===
-                            "Escape"
-                        ) {
-
-                            dateArea.classList.remove(
-                                "editing"
-                            );
-                        }
-                    }
-                );
+                    const bills =
+                        await getBills();
 
 
-                input.addEventListener(
-                    "blur",
-                    function() {
-
-                        dateArea.classList.remove(
-                            "editing"
+                    const updatedBill =
+                        bills.find(
+                            item =>
+                                String(item.id) ===
+                                String(
+                                    dateArea.dataset.billId
+                                )
                         );
+
+
+                    if (updatedBill) {
+
+                        updateBillCompletion(
+                            updatedBill
+                        );
+                    }
+
+
+                    await loadDashboard();
                     }
                 );
             }
         );
 }
-
 
 function initializeBillFrequencies() {
 
@@ -2883,88 +3009,45 @@ function initializeBillFrequencies() {
             ".bill-frequency"
         )
         .forEach(
-            frequencyArea => {
-
-                const display =
-                    frequencyArea.querySelector(
-                        ".bill-frequency-display"
-                    );
-
-
-                const input =
-                    frequencyArea.querySelector(
-                        ".bill-frequency-input"
-                    );
-
+            frequencyInput => {
 
                 const bill =
-                    frequencyArea.closest(
+                    frequencyInput.closest(
                         ".bill"
                     );
 
-
-                if (
-                    !display ||
-                    !input ||
-                    !bill
-                ) {
-
+                if (!bill) {
                     return;
                 }
 
-
-                display.addEventListener(
+                frequencyInput.addEventListener(
                     "click",
                     function(event) {
 
                         event.stopPropagation();
-
 
                         selectBill(
                             bill
                         );
-
-
-                        frequencyArea.classList.add(
-                            "editing"
-                        );
-
-
-                        input.focus();
                     }
                 );
 
-
-                input.addEventListener(
-                    "click",
-                    function(event) {
-
-                        event.stopPropagation();
-                    }
-                );
-
-
-                input.addEventListener(
+                frequencyInput.addEventListener(
                     "change",
                     async function() {
 
                         const frequency =
-                            input.value;
-
+                            frequencyInput.value;
 
                         const headers =
                             await getAuthHeaders();
 
-
                         if (!headers) {
-
                             console.error(
                                 "No authenticated session."
                             );
-
                             return;
                         }
-
 
                         const response =
                             await fetch(
@@ -2988,29 +3071,18 @@ function initializeBillFrequencies() {
                                 }
                             );
 
-
                         if (!response.ok) {
-
                             console.error(
                                 "Failed to update bill frequency:",
                                 await response.text()
                             );
-
-
                             return;
                         }
-
-
-                        frequencyArea.classList.remove(
-                            "editing"
-                        );
-
 
                         const billId =
                             Number(
                                 bill.dataset.billId
                             );
-
 
                         if (
                             billSetupProgress.has(
@@ -3026,10 +3098,8 @@ function initializeBillFrequencies() {
                                 );
                         }
 
-
                         const bills =
                             await getBills();
-
 
                         const updatedBill =
                             bills.find(
@@ -3040,7 +3110,6 @@ function initializeBillFrequencies() {
                                     )
                             );
 
-
                         if (updatedBill) {
 
                             updateBillCompletion(
@@ -3048,19 +3117,7 @@ function initializeBillFrequencies() {
                             );
                         }
 
-
                         await loadDashboard();
-                    }
-                );
-
-
-                input.addEventListener(
-                    "blur",
-                    function() {
-
-                        frequencyArea.classList.remove(
-                            "editing"
-                        );
                     }
                 );
             }
@@ -3179,7 +3236,6 @@ function initializeBillDeletes() {
         );
 }
 
-
 function initializeBillSelection() {
 
     document
@@ -3199,6 +3255,15 @@ function initializeBillSelection() {
                             )
                         ) {
 
+                            if (
+                                bill.classList.contains(
+                                    "incomplete"
+                                )
+                            ) {
+
+                                return;
+                            }
+
                             bill.classList.remove(
                                 "selected"
                             );
@@ -3210,12 +3275,12 @@ function initializeBillSelection() {
                                 bill
                             );
                         }
+
                     }
                 );
             }
         );
 }
-
 
 /* =========================================================
    ADD BILL

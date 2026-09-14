@@ -292,7 +292,7 @@ body {
 .bill-name-input {
     display: none;
 
-    width: 15ch;
+    width: auto;
 
     border: none;
     border-bottom: 1px solid #d2d2d7;
@@ -360,54 +360,57 @@ body {
     cursor: pointer;
 }
 
-
 /* ----------------------------------------
    Inline Editing — Amount
 ---------------------------------------- */
 
-.bill-amount-input {
+.bill-amount-edit {
     display: none;
 
-    width: 90px;
+    align-items: center;
+}
+
+.bill-amount-dollar {
+    font-size: 17px;
+    font-weight: 600;
+
+    color: #1d1d1f;
+}
+
+.bill-amount-input {
+    width: auto;
 
     border: none;
     border-bottom: 1px solid #d2d2d7;
 
     padding: 0;
+    margin: 0;
 
     font-family: inherit;
     font-size: 17px;
     font-weight: 600;
+    line-height: normal;
 
     color: #1d1d1f;
-
-    text-align: right;
 
     background: transparent;
 
     outline: none;
 
-    line-height: normal;
+    text-align: right;
 }
 
 .bill-amount.editing .bill-amount-display {
     display: none;
 }
 
-.bill-amount.editing .bill-amount-input {
-    display: block;
+.bill-amount.editing .bill-amount-edit {
+    display: inline-flex;
 }
-
-
-/* ----------------------------------------
-   Active Inline Input
----------------------------------------- */
 
 .bill-amount-input:focus {
     border-bottom-color: #a1a1a6;
-    padding: 0px;
 }
-
 
 /* ----------------------------------------
    Bill Delete X
@@ -486,16 +489,13 @@ body {
     gap: 8px;
 }
 
-
 /* ----------------------------------------
    Bill Date
 ---------------------------------------- */
 
 .bill-date {
     display: inline-flex;
-
     align-items: center;
-
     position: relative;
 }
 
@@ -503,98 +503,80 @@ body {
     font-size: 11px;
     font-weight: 500;
     color: #86868b;
-}
 
-.bill-date-input {
-    display: none;
-
-    width: auto;
-
-    border: none;
-    border-bottom: 1px solid #d2d2d7;
-
-    padding: 0;
-    margin: 0;
-
-    font-family: inherit;
-    font-size: 14px;
-    line-height: normal;
-
-    color: #1d1d1f;
-
-    background: transparent;
-
-    outline: none;
+    cursor: pointer;
 }
 
 .bill-date::before {
     content: "·";
+
     margin-right: 6px;
+
     color: #c7c7cc;
 }
 
-.bill-date.editing .bill-date-display {
-    display: none;
+.bill-date-icon {
+    width: 13px;
+    height: 13px;
+
+    margin-left: 4px;
+
+    vertical-align: -2.5px;
+
+    color: #a1a1a6;
 }
 
-.bill-date.editing .bill-date-input {
-    display: inline-block;
-}
+.bill-date-input {
+    position: absolute;
 
-.bill-date-input:focus {
-    border-bottom-color: #a1a1a6;
-}
+    inset: 0;
 
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+
+    cursor: pointer;
+}
 
 /* ----------------------------------------
    Bill Frequency
 ---------------------------------------- */
 
 .bill-frequency {
-    display: inline-flex;
+    appearance: none;
+    -webkit-appearance: none;
 
-    align-items: center;
-}
-
-.bill-frequency-display {
     display: inline-block;
-    padding: 3px 7px;
-    border-radius: 7px;
-    background: #f0f0f2;
-    color: #6e6e73;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
 
-.bill-frequency-input {
-    display: none;
+    padding: 3px 20px 3px 7px;
 
     border: none;
-    border-bottom: 1px solid #1d1d1f;
+    border-radius: 7px;
 
-    padding: 2px 0;
+    background-color: #f0f0f2;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #86868b 50%),
+        linear-gradient(135deg, #86868b 50%, transparent 50%);
+    background-position:
+        calc(100% - 8px) 50%,
+        calc(100% - 4px) 50%;
+    background-size:
+        4px 4px,
+        4px 4px;
+    background-repeat: no-repeat;
+
+    color: #6e6e73;
 
     font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
 
-    font-size: 14px;
+    letter-spacing: 0.5px;
 
-    color: #1d1d1f;
-
-    background: transparent;
-
+    cursor: pointer;
     outline: none;
 }
-
-.bill-frequency.editing .bill-frequency-display {
-    display: none;
-}
-
-.bill-frequency.editing .bill-frequency-input {
-    display: block;
-}
-
 
 /* ----------------------------------------
    Empty State
@@ -828,6 +810,10 @@ button:hover {
         font-size: 25px;
     }
 
+    .paycheck-form input {
+        text-align: center;
+    }
+
     .bills-section {
         border-radius: 22px;
 
@@ -909,40 +895,8 @@ button:hover {
         -webkit-appearance: none;
         appearance: none;
     }
-
-    .bill-date-desktop {
-        display: none;
-    }
-
-    .bill-date-mobile {
-        display: inline;
-    }
-
-    .bill-date-multiple {
-        display: none;
-    }
 }
 
-.bill-date-multiple {
-    display: block;
-
-    margin-top: 8px;
-
-    font-size: 11px;
-    font-weight: 500;
-
-    color: #a1a1a6;
-
-    letter-spacing: 0.1px;
-}
-
-.bill-date-display.outside-period {
-    color: #b0b0b5;
-}
-
-.bill-delete.confirm-delete {
-    color: #1d1d1f;
-}
 
 /* =========================================================
    AUTH SCREEN
@@ -1170,4 +1124,15 @@ button:hover {
     to {
         transform: rotate(360deg);
     }
+}
+
+.no-bills {
+    padding: 24px 0;
+
+    text-align: center;
+
+    color: #86868b;
+
+    font-size: 13px;
+    font-weight: 400;
 }
