@@ -909,7 +909,7 @@ button:hover {
 
     #update-pay-modal input,
     #update-pay-modal select {
-        text-align: center;
+        text-align: left;
     }
 
     #logout-button {
