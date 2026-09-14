@@ -137,6 +137,14 @@ body {
     text-align: center;
 }
 
+.card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.card.disabled .card-action {
+    pointer-events: none;
+}
 
 /* ----------------------------------------
    Clickable Summary Cards
@@ -247,6 +255,13 @@ body {
     color: #a1a1a6;
 }
 
+.bill-occurrence-count {
+    margin-left: 2px;
+    color: #a1a1a6;
+    font-size: 13px;
+    font-weight: 400;
+    white-space: nowrap;
+}
 
 /* ----------------------------------------
    Bill Primary Row
@@ -830,11 +845,9 @@ button:hover {
         font-size: 16px;
     }
 
-
     .bill-amount-display {
         font-size: 16px;
     }
-
 
     .bill .bill-delete {
         position: static;
@@ -845,7 +858,6 @@ button:hover {
         font-size: 22px;
         line-height: 28px;
     }
-
 
     /* Prevent the native iPhone date input
        from overflowing the modal */
@@ -858,19 +870,46 @@ button:hover {
         -webkit-appearance: none;
     }
 
+        .modal {
+        align-items: center;
+        justify-content: center;
 
-    .modal {
-        align-items: flex-end;
-
-        padding: 0;
+        padding: 16px;
     }
 
     .modal .form-section {
         width: 100%;
+        max-width: 480px;
 
         max-height: 90vh;
 
-        border-radius: 24px 24px 0 0;
+        margin: 0;
+
+        border-radius: 24px;
+
+        overflow-y: auto;
+    }
+
+    .modal .bill-form {
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .modal .form-field {
+        width: 100%;
+    }
+
+    .modal .form-field input,
+    .modal .form-field select,
+    .modal .bill-form button {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    #update-pay-modal input,
+    #update-pay-modal select {
+        text-align: center;
     }
 
     #logout-button {
@@ -1135,4 +1174,8 @@ button:hover {
 
     font-size: 13px;
     font-weight: 400;
+}
+
+#add-paycheck-section {
+    margin-bottom: 2rem;
 }

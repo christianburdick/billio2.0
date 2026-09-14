@@ -639,37 +639,45 @@ async function loadDashboard() {
         );
 
 
+    const billsSection =
+        document.querySelector(
+            ".bills-section"
+        );
+
+
+    const billsCard =
+        document.getElementById(
+            "bills-card"
+        );
+
+
     if (!income) {
 
         addPaycheckSection.style.display =
             "block";
 
+        billsSection.style.display =
+            "none";
 
-        document.querySelector(
-            ".bills-list"
-        ).innerHTML = "";
-
+        billsCard.classList.add(
+            "disabled"
+        );
 
         paycheckAmount.textContent =
             "$0.00";
 
-
         billsTotal.textContent =
             "$0.00";
-
 
         heroAmount.textContent =
             "$0.00";
 
-
         payPeriod.textContent =
             "Add your paycheck";
-
 
         console.log(
             "No income found."
         );
-
 
         return;
     }
@@ -677,6 +685,13 @@ async function loadDashboard() {
 
     addPaycheckSection.style.display =
         "none";
+
+    billsSection.style.display =
+        "block";
+
+    billsCard.classList.remove(
+        "disabled"
+    );
 
 
     const payDate =
@@ -779,7 +794,6 @@ async function loadDashboard() {
         remaining
     );
 
-
     if (selectedBillId) {
 
         const bill =
@@ -787,11 +801,17 @@ async function loadDashboard() {
                 `.bill[data-bill-id="${selectedBillId}"]`
             );
 
-
         if (bill) {
 
             bill.classList.add(
                 "selected"
+            );
+
+            updateBillMultiplier(
+                bill,
+                !bill.classList.contains(
+                    "incomplete"
+                )
             );
         }
     }
@@ -1255,17 +1275,6 @@ function updateBillCompletion(
             bill.id
         );
 
-        const billElement =
-            document.querySelector(
-                `.bill[data-bill-id="${bill.id}"]`
-            );
-
-        if (billElement) {
-
-            billElement.classList.remove(
-                "selected"
-            );
-        }
     }
 
     else {
@@ -1355,6 +1364,21 @@ function createBillHtml(
                             $${amount}
                         </span>
 
+                        ${
+                            !isIncomplete &&
+                            occurrenceDates &&
+                            occurrenceDates.length > 1
+                                ? `
+                                    <span
+                                        class="bill-occurrence-count"
+                                        style="display: none;"
+                                    >
+                                        ×${occurrenceDates.length}
+                                    </span>
+                                `
+                                : ""
+                        }
+
                         <div class="bill-amount-edit">
 
                             <span class="bill-amount-dollar">$</span>
@@ -1370,7 +1394,6 @@ function createBillHtml(
                         </div>
 
                     </div>
-
 
                     <button
                         class="bill-delete"
@@ -1407,14 +1430,6 @@ function createBillHtml(
 
                         <option value="monthly" ${bill.frequency === "monthly" ? "selected" : ""}>
                             Monthly
-                        </option>
-
-                        <option value="quarterly" ${bill.frequency === "quarterly" ? "selected" : ""}>
-                            Quarterly
-                        </option>
-
-                        <option value="yearly" ${bill.frequency === "yearly" ? "selected" : ""}>
-                            Yearly
                         </option>
                     </select>
 
@@ -1879,6 +1894,25 @@ async function saveBillOrder() {
 /* =========================================================
    BILL SELECTION
    ========================================================= */
+function updateBillMultiplier(
+    billElement,
+    show
+) {
+
+    const multiplier =
+        billElement.querySelector(
+            ".bill-occurrence-count"
+        );
+
+    if (!multiplier) {
+        return;
+    }
+
+    multiplier.style.display =
+        show
+            ? "inline"
+            : "none";
+}
 
 function selectBill(
     billElement
@@ -1896,7 +1930,6 @@ function selectBill(
                         ".bill-name"
                     );
 
-
                 if (nameArea) {
 
                     nameArea.classList.remove(
@@ -1904,12 +1937,10 @@ function selectBill(
                     );
                 }
 
-
                 const deleteButton =
                     bill.querySelector(
                         ".bill-delete"
                     );
-
 
                 if (deleteButton) {
 
@@ -1921,6 +1952,10 @@ function selectBill(
                     );
                 }
 
+                updateBillMultiplier(
+                    bill,
+                    false
+                );
 
                 bill.classList.remove(
                     "selected"
@@ -1932,6 +1967,29 @@ function selectBill(
     billElement.classList.add(
         "selected"
     );
+
+
+    const amountArea =
+        billElement.querySelector(
+            ".bill-amount"
+        );
+
+
+    const isEditingAmount =
+        amountArea?.classList.contains(
+            "editing"
+        );
+
+
+    if (!isEditingAmount) {
+
+        updateBillMultiplier(
+            billElement,
+            !billElement.classList.contains(
+                "incomplete"
+            )
+        );
+    }
 }
 
 
@@ -2469,6 +2527,10 @@ function initializeBillAmounts() {
                             "editing"
                         );
 
+                        updateBillMultiplier(
+                            bill,
+                            false
+                        );
 
                         resizeAmountInput();
 
@@ -2579,6 +2641,16 @@ function initializeBillAmounts() {
                                 "editing"
                             );
 
+                            updateBillMultiplier(
+                                bill,
+                                bill.classList.contains(
+                                    "selected"
+                                ) &&
+                                !bill.classList.contains(
+                                    "incomplete"
+                                )
+                            );
+
 
                             return;
                         }
@@ -2674,6 +2746,15 @@ function initializeBillAmounts() {
                             "editing"
                         );
 
+                        updateBillMultiplier(
+                            bill,
+                            bill.classList.contains(
+                                "selected"
+                            ) &&
+                            !bill.classList.contains(
+                                "incomplete"
+                            )
+                        );
 
                         const billId =
                             Number(
@@ -2812,7 +2893,16 @@ function initializeBillAmounts() {
                         amountArea.classList.remove(
                             "editing"
                         );
-
+                        
+                        updateBillMultiplier(
+                            bill,
+                            bill.classList.contains(
+                                "selected"
+                            ) &&
+                            !bill.classList.contains(
+                                "incomplete"
+                            )
+                        );
 
                         const billId =
                             Number(
@@ -2881,12 +2971,19 @@ function initializeBillDates() {
                         ".bill-date-input"
                     );
 
+                const bill =
+                    dateArea.closest(
+                        ".bill"
+                    );
+
                 if (
                     !dateDisplay ||
-                    !dateInput
+                    !dateInput ||
+                    !bill
                 ) {
                     return;
                 }
+
 
                 dateDisplay.addEventListener(
                     "click",
@@ -2896,6 +2993,7 @@ function initializeBillDates() {
                     }
                 );
 
+
                 dateInput.addEventListener(
                     "click",
                     function(event) {
@@ -2904,6 +3002,7 @@ function initializeBillDates() {
                     }
                 );
 
+
                 dateInput.addEventListener(
                     "change",
                     async function() {
@@ -2911,19 +3010,36 @@ function initializeBillDates() {
                         const dueDate =
                             dateInput.value;
 
+
+                        const billId =
+                            Number(
+                                bill.dataset.billId
+                            );
+
+
+                        const wasSelected =
+                            bill.classList.contains(
+                                "selected"
+                            );
+
+
                         const headers =
                             await getAuthHeaders();
 
+
                         if (!headers) {
+
                             console.error(
                                 "No authenticated session."
                             );
+
                             return;
                         }
 
+
                         const response =
                             await fetch(
-                                `${SUPABASE_URL}/rest/v1/bills?id=eq.${dateArea.dataset.billId}`,
+                                `${SUPABASE_URL}/rest/v1/bills?id=eq.${billId}`,
                                 {
                                     method:
                                         "PATCH",
@@ -2943,64 +3059,77 @@ function initializeBillDates() {
                                 }
                             );
 
+
                         if (!response.ok) {
-                        console.error(
-                            "Failed to update bill date:",
-                            await response.text()
-                        );
-                        return;
-                    }
 
-
-                    const billId =
-                        Number(
-                            dateArea.dataset.billId
-                        );
-
-
-                    if (
-                        billSetupProgress.has(
-                            billId
-                        )
-                    ) {
-
-                        billSetupProgress.get(
-                            billId
-                        ).date =
-                            Boolean(
-                                dueDate
+                            console.error(
+                                "Failed to update bill date:",
+                                await response.text()
                             );
-                    }
+
+                            return;
+                        }
 
 
-                    const bills =
-                        await getBills();
+                        if (
+                            billSetupProgress.has(
+                                billId
+                            )
+                        ) {
+
+                            billSetupProgress.get(
+                                billId
+                            ).date =
+                                true;
+                        }
 
 
-                    const updatedBill =
-                        bills.find(
-                            item =>
-                                String(item.id) ===
-                                String(
-                                    dateArea.dataset.billId
-                                )
-                        );
+                        const bills =
+                            await getBills();
 
 
-                    if (updatedBill) {
+                        const updatedBill =
+                            bills.find(
+                                item =>
+                                    String(item.id) ===
+                                    String(billId)
+                            );
 
-                        updateBillCompletion(
-                            updatedBill
-                        );
-                    }
+
+                        if (updatedBill) {
+
+                            updateBillCompletion(
+                                updatedBill
+                            );
+                        }
 
 
-                    await loadDashboard();
+                        await loadDashboard();
+
+
+                        if (wasSelected) {
+
+                            const updatedBillElement =
+                                document.querySelector(
+                                    `.bill[data-bill-id="${billId}"]`
+                                );
+
+
+                            if (updatedBillElement) {
+
+                                selectBill(
+                                    updatedBillElement
+                                );
+                            }
+                        }
+
                     }
                 );
+
             }
         );
 }
+
 
 function initializeBillFrequencies() {
 
@@ -3026,9 +3155,16 @@ function initializeBillFrequencies() {
 
                         event.stopPropagation();
 
-                        selectBill(
-                            bill
-                        );
+                        if (
+                            !bill.classList.contains(
+                                "selected"
+                            )
+                        ) {
+
+                            bill.classList.add(
+                                "selected"
+                            );
+                        }
                     }
                 );
 
@@ -3093,9 +3229,7 @@ function initializeBillFrequencies() {
                             billSetupProgress.get(
                                 billId
                             ).frequency =
-                                Boolean(
-                                    frequency
-                                );
+                                true;
                         }
 
                         const bills =
@@ -3123,7 +3257,6 @@ function initializeBillFrequencies() {
             }
         );
 }
-
 
 function initializeBillDeletes() {
 
@@ -3161,6 +3294,32 @@ function initializeBillDeletes() {
 
                             const billId =
                                 bill.dataset.billId;
+
+
+                            const billName =
+                                bill.querySelector(
+                                    ".bill-name-display"
+                                )?.textContent.trim() ||
+                                "this bill";
+
+
+                            const confirmed =
+                                window.confirm(
+                                    `Are you sure you want to delete "${billName}"?`
+                                );
+
+
+                            if (!confirmed) {
+
+                                button.textContent =
+                                    "×";
+
+                                button.classList.remove(
+                                    "confirm-delete"
+                                );
+
+                                return;
+                            }
 
 
                             const headers =
@@ -3267,6 +3426,11 @@ function initializeBillSelection() {
                             bill.classList.remove(
                                 "selected"
                             );
+
+                            updateBillMultiplier(
+                                bill,
+                                false
+                            );
                         }
 
                         else {
@@ -3285,8 +3449,14 @@ function initializeBillSelection() {
 /* =========================================================
    ADD BILL
    ========================================================= */
-
 async function addBill() {
+
+    const income =
+        await getIncome();
+
+    if (!income) {
+        return;
+    }
 
     const {
         data: {
@@ -3434,10 +3604,10 @@ async function addBill() {
                 false,
 
             frequency:
-                false,
+                true,
 
             date:
-                false,
+                true,
         }
     );
 
@@ -3494,65 +3664,94 @@ if (billsCard) {
 /* =========================================================
    AUTHENTICATION
    ========================================================= */
-
 const authScreen =
-    document.getElementById(
-        "auth-screen"
-    );
-
+document.getElementById(
+"auth-screen"
+);
 
 const app =
-    document.querySelector(
-        ".container"
-    );
-
+document.querySelector(
+".container"
+);
 
 const authForm =
-    document.getElementById(
-        "auth-form"
-    );
-
+document.getElementById(
+"auth-form"
+);
 
 const authToggle =
-    document.getElementById(
-        "auth-toggle"
-    );
-
+document.getElementById(
+"auth-toggle"
+);
 
 const authSubmit =
-    document.getElementById(
-        "auth-submit"
-    );
+document.getElementById(
+"auth-submit"
+);
 
+const passwordConfirm =
+document.getElementById(
+"auth-password-confirm"
+);
 
 let isSignUp =
-    false;
-
+false;
 
 /* =========================================================
-   AUTH MODE TOGGLE
-   ========================================================= */
+AUTH MODE TOGGLE
+========================================================= */
 
-authToggle.addEventListener(
+function updateAuthForm() {
+
+    if (isSignUp) {
+
+        passwordConfirm.style.display =
+            "block";
+
+        passwordConfirm.required =
+            true;
+
+        authSubmit.textContent =
+            "Sign Up";
+
+        authToggle.textContent =
+            "Already have an account? Log in";
+    }
+
+    else {
+
+        passwordConfirm.style.display =
+            "none";
+
+        passwordConfirm.required =
+            false;
+
+        passwordConfirm.value =
+            "";
+
+        authSubmit.textContent =
+            "Log In";
+
+        authToggle.textContent =
+            "Don't have an account? Sign up";
+    }
+
+    }
+
+    authToggle.addEventListener(
     "click",
     function() {
 
         isSignUp =
             !isSignUp;
 
-
-        authSubmit.textContent =
-            isSignUp
-                ? "Sign Up"
-                : "Log In";
-
-
-        authToggle.textContent =
-            isSignUp
-                ? "Already have an account? Log in"
-                : "Don't have an account? Sign up";
+        updateAuthForm();
     }
+
 );
+
+updateAuthForm();
+
 
 
 /* =========================================================
@@ -3577,6 +3776,23 @@ authForm.addEventListener(
                 "auth-password"
             ).value;
 
+        const passwordConfirm =
+            document.getElementById(
+                "auth-password-confirm"
+            ).value;
+
+
+        if (
+            isSignUp &&
+            password !== passwordConfirm
+        ) {
+
+            alert(
+                "Passwords do not match."
+            );
+
+            return;
+        }
 
         let result;
 
