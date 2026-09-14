@@ -1,3 +1,7 @@
+#auth-screen {
+    display: none;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -44,8 +48,27 @@ body {
     letter-spacing: -1px;
 }
 
+.header {
+    margin-bottom: 28px;
+}
+
+.header h1 {
+    margin: 0;
+
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -1px;
+}
+
 .header p {
-    display: none;
+    margin: 6px 0 0;
+
+    color: #86868b;
+
+    font-size: 15px;
+    font-weight: 400;
+
+    letter-spacing: -0.1px;
 }
 
 
@@ -213,6 +236,15 @@ body {
 
 .bill.outside-period {
     opacity: 0.4;
+}
+
+.bill.incomplete {
+    color: #a1a1a6;
+}
+
+.bill.incomplete .bill-amount,
+.bill.incomplete .bill-name-display {
+    color: #a1a1a6;
 }
 
 
@@ -435,8 +467,6 @@ body {
 .bill-details {
     display: none;
 
-    gap: 8px;
-
     margin-top: 6px;
 
     font-size: 14px;
@@ -445,7 +475,15 @@ body {
 }
 
 .bill.selected .bill-details {
+    display: block;
+}
+
+.bill-details-row {
     display: flex;
+
+    align-items: center;
+
+    gap: 8px;
 }
 
 
@@ -786,6 +824,9 @@ button:hover {
         padding: 20px;
     }
 
+    .card-value {
+        font-size: 25px;
+    }
 
     .bills-section {
         border-radius: 22px;
@@ -798,7 +839,7 @@ button:hover {
         gap: 16px;
     }
 
-
+    
     .bill-name-display {
         font-size: 16px;
     }
@@ -845,8 +886,55 @@ button:hover {
 
         border-radius: 24px 24px 0 0;
     }
+
+    #logout-button {
+        margin-top: 32px;
+        font-size: 12px;
+    }
+
+        .bill-form {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .bill-form input,
+    .bill-form select,
+    .bill-form button {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .bill-form input[type="date"] {
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .bill-date-desktop {
+        display: none;
+    }
+
+    .bill-date-mobile {
+        display: inline;
+    }
+
+    .bill-date-multiple {
+        display: none;
+    }
 }
 
+.bill-date-multiple {
+    display: block;
+
+    margin-top: 8px;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    color: #a1a1a6;
+
+    letter-spacing: 0.1px;
+}
 
 .bill-date-display.outside-period {
     color: #b0b0b5;
@@ -854,4 +942,232 @@ button:hover {
 
 .bill-delete.confirm-delete {
     color: #1d1d1f;
+}
+
+/* =========================================================
+   AUTH SCREEN
+   ========================================================= */
+
+#auth-screen {
+    min-height: 100vh;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    box-sizing: border-box;
+}
+
+
+.auth-container {
+    width: 100%;
+    max-width: 360px;
+
+    text-align: center;
+}
+
+
+/* ----------------------------------------
+   Auth Form
+---------------------------------------- */
+
+#auth-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+#auth-form input {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 1px solid #d2d2d7;
+
+    border-radius: 12px;
+
+    background: white;
+
+    color: #1d1d1f;
+
+    font-family: inherit;
+    font-size: 16px;
+
+    outline: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+#auth-form input:focus {
+    border-color: #1d1d1f;
+
+    box-shadow:
+        0 0 0 1px #1d1d1f;
+}
+
+
+#auth-form input::placeholder {
+    color: #86868b;
+}
+
+
+/* ----------------------------------------
+   Auth Button
+---------------------------------------- */
+
+#auth-submit {
+    width: 100%;
+
+    margin-top: 4px;
+
+    padding: 13px 16px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #1d1d1f;
+    color: white;
+
+    font-family: inherit;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease;
+}
+
+
+#auth-submit:hover {
+    opacity: 0.85;
+}
+
+
+#auth-submit:active {
+    transform: scale(0.98);
+
+    opacity: 0.7;
+}
+
+
+/* ----------------------------------------
+   Auth Toggle
+---------------------------------------- */
+
+#auth-toggle {
+    margin-top: 18px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #86868b;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 400;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease;
+}
+
+
+#auth-toggle:hover {
+    color: #1d1d1f;
+
+    opacity: 1;
+}
+
+#logout-button {
+    display: block;
+
+    margin: 32px auto 0;
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    color: #a1a1a6;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 400;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease;
+}
+
+
+#logout-button:hover {
+    color: #6e6e73;
+
+    opacity: 1;
+}
+
+/* =========================================================
+   LOADING SCREEN
+   ========================================================= */
+
+#loading-screen {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+
+    z-index: 9999;
+}
+
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+
+    border: 2px solid #d2d2d7;
+    border-top-color: #1d1d1f;
+
+    border-radius: 50%;
+
+    animation:
+        loading-spin
+        0.8s
+        linear
+        infinite;
+
+    margin-bottom: 16px;
+}
+
+
+@keyframes loading-spin {
+
+    to {
+        transform: rotate(360deg);
+    }
 }

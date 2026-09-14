@@ -22,13 +22,75 @@
 
 <body>
 
+    <div id="auth-screen">
+
+    <div class="auth-container">
+
+        <header class="header">
+
+            <h1>Bill.io 💸</h1>
+
+            <p>Your money, organized.</p>  
+                     
+        </header>
+
+
+        <form id="auth-form">
+
+            <input
+                id="auth-email"
+                type="email"
+                placeholder="Email"
+                required
+            >
+
+            <input
+                id="auth-password"
+                type="password"
+                placeholder="Password"
+                required
+            >
+
+            <button
+                id="auth-submit"
+                type="submit"
+            >
+                Log In
+            </button>
+
+        </form>
+
+
+        <button
+            id="auth-toggle"
+            type="button"
+        >
+            Don't have an account? Sign up
+        </button>
+
+    </div>
+
+</div>
+
+<div id="loading-screen">
+
+    <div class="loading-content">
+
+        <div class="loading-spinner"></div>
+
+        <div class="loading-logo">
+            Bill.io
+        </div>   
+
+    </div>
+
+</div>
+
 <div class="container">
 
 <header class="header">
 
     <h1>Bill.io</h1>
-
-    <p>Your money, organized.</p>
 
 </header>
 
@@ -294,9 +356,12 @@
 
 </section>
 
+<button id="logout-button" type="button">
+    Log Out
+</button>
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
 
 </body>
